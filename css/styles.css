@@ -1,0 +1,700 @@
+/*
+ITSE 1301 - David McGovern - Final Project - My Styles
+7/24/2024
+
+Revised with modern CSS practices.
+*/
+
+/* CSS Variables (Custom Properties) */
+:root {
+    --font-heading: 'Montserrat', Arial, Helvetica, sans-serif;
+    --font-body: 'Open Sans', Arial, Helvetica, sans-serif;
+    --font-serif: 'Lora', Georgia, 'Times New Roman', serif;
+    
+    --color-text-primary: black;
+    --color-text-light: white;
+    --color-background-light: #f9f9f9;
+    --color-background-medium: #f2f2f2;
+    --color-border-light: #ddd;
+    --color-border-medium: #ccc;
+    --color-primary-blue: #007BFF;
+    --color-primary-blue-dark: #0056b3;
+    --color-dark-gray: #444;
+    --color-dark-gray-hover: #555;
+    
+    /* Type Scale */
+    --text-base: 1rem;      /* 16px default */
+    --text-sm: 0.875rem;    /* 14px */
+    --text-lg: 1.125rem;    /* 18px */
+    --text-h3: 1.5rem;      /* 24px */
+    --text-h2: 2.25rem;     /* 36px */
+    --text-h1: 3rem;        /* 48px */
+}
+
+/*General Styles*/
+h1 {
+    font-family: var(--font-heading);
+    font-weight: 500;
+    font-size: var(--text-h1);
+    margin: 0;
+}
+
+h2 {
+    font-family: var(--font-heading);
+    font-weight: 500;
+    font-size: var(--text-h2);
+    margin: 0;
+}
+
+h3 {
+    font-family: var(--font-serif);
+    font-weight: 500;
+    font-size: var(--text-h3);
+    margin: 0 auto;
+}
+
+p {
+    font-family: var(--font-body);
+    font-weight: 400;
+    font-size: var(--text-base); /* Changed from 3em to 1rem */
+    line-height: 1.6; /* Added for readability */
+    margin: 0px;
+}
+
+a:link {
+    color: var(--color-text-primary);
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--color-text-primary);
+    text-decoration: underline;
+}
+
+a:visited {
+    color: var(--color-text-primary);
+    text-decoration: none;
+}
+
+a:active {
+    color: var(--color-text-primary);
+    text-decoration: none;
+}
+
+/*Navigation Styles*/
+img.logo {
+    width: 10vw;
+    height: auto;
+}
+
+img.logo:hover {
+    filter: drop-shadow(0 0 5px rgba(0,0,0,0.4)); /* Added shadow values */
+}
+
+/*Header Styles*/
+
+.mcgovern_design_header {
+    margin: 0px auto;
+    display: flex;
+    flex-direction: column; /* Adjusts content to stack vertically */
+    justify-content: center;
+    align-items: center;
+    /* Removed "magic number" calc(), using center instead */
+    /* Note: updated image path */
+    background: url(../images/lukasz-szmigiel-jFCViYFYcus-unsplash.jpg) no-repeat center center / cover;
+    width: 100%;
+}
+
+header {
+    padding: 2em 0 2em 0;
+}
+
+.header_text {
+    background-color: rgba(255, 255, 255, 0.7);
+    padding: 0em;
+    margin: 0em;
+    text-align: center;
+}
+
+.slogan {
+    text-align: center;
+}
+
+header h1 {
+    font-size: var(--text-h1); /* Using variable */
+    padding: 2vw 2vw 1vw 2vw;
+    margin: 0em;
+}
+
+header h2 {
+    font-size: var(--text-h2); /* Using variable */
+    padding: 0vw 1vw 2vw 1vw;
+    margin: 0em;
+}
+
+/*About Styles*/
+
+.about_section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Distributes space between elements */
+    max-width: 80vw; /* Maximum width for the entire section */
+    margin: 0 auto; /* Centers the section horizontally */
+}
+
+.about_photo {
+    flex: 0;
+    display: flex;
+    justify-content: center; /* Centers the photo within its container */
+    margin: 10vh 0 0 0;
+}
+
+.about_photo img {
+    width: 15vw;
+    height: 15vw;
+    object-fit: cover; /* Crops the image to fit the square */
+    object-position: top center; /* Centers the face in the upper third */
+    border-radius: 50%; /* Optional: Makes the image circular */
+}
+
+.about_text {
+    flex: 1;
+    max-width: 70vw; /* Maximum width for the text */
+    margin: 10vh 0 0 3vw;
+}
+
+.bio {
+    font-family: var(--font-body);
+    font-size: var(--text-lg); /* Using variable, 1.125rem */
+}
+
+/* Semantic social nav list styles */
+.social_nav {
+    text-align: center;
+    margin-top: 1em;
+}
+
+.social_nav ul {
+    padding: 0;
+    margin: 0;
+    list-style-type: none; /* Removes bullets */
+}
+
+.social_nav li {
+    display: inline-block; /* Aligns icons horizontally */
+    margin: 0 0.5em; /* Space between icons */
+}
+
+.social_nav img {
+    width: 3vw; /* Adjust icon size */
+    height: auto;
+}
+
+/*My Work Section*/
+
+.my_work_section {
+    margin: 10vh 0;
+}
+
+.my_work_section_header {
+    margin: 0px auto;
+    position: relative;
+    background-size: cover;
+    width: 100%;
+    height: 25vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#websites_header {
+    background: url('../images/christoffer-engstrom-wc9avd2RaN0-unsplash.jpg') no-repeat center center;
+}
+
+#graphic_design_header {
+    background: url('../images/greg-rakozy-fb70I7JHQe8-unsplash.jpg') no-repeat center -50vh;
+}
+
+.subsection_label {
+    text-align: center;
+    display: none;
+}
+
+.my_work_title {
+    background-color: rgba(255, 255, 255, 0.7); /* 70% transparent white background */
+    padding: 1em 2em;
+    text-align: center;
+    margin: 0;
+}
+
+.work_example img {
+    width: 20vw;
+    height: auto;
+    border-radius: 10%;
+}
+
+.work_example_section {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start; /* Changed from center to align text */
+    gap: 2em; /* Space between the two elements */
+    padding: 2em 0; /* Adjust padding to your preference */
+    text-align: center; /* Center the text below the images */
+    margin: 0px auto;
+    width: 80%;
+}
+
+.work_example {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 25vw;
+}
+
+.work_example p {
+    margin-top: 0.5em; /* Space between image and text */
+    font-size: var(--text-sm); /* Using variable, 0.875rem */
+}
+
+.work_example_section a:hover {
+    color: var(--color-text-primary);
+    text-decoration: none;
+}
+
+
+/* General Styles for the Values Section */
+.values-section {
+    margin: 2em auto;
+    padding: 2em;
+    max-width: 80%;
+    text-align: center;
+}
+
+.values-section h2 {
+    font-family: var(--font-body);
+    font-size: var(--text-h2);
+    margin-bottom: 1em;
+}
+
+.values-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, auto);
+    gap: 1em;
+    justify-content: center;
+}
+
+.values-grid .value-item:nth-child(4),
+.values-grid .value-item:nth-child(5) {
+    grid-column: span 1;
+}
+
+.values-grid .value-item:nth-child(1),
+.values-grid .value-item:nth-child(2),
+.values-grid .value-item:nth-child(3) {
+    grid-column: span 1;
+}
+
+.value-item {
+    background-color: var(--color-background-light);
+    border: 1px solid var(--color-border-light);
+    border-radius: 8px;
+    padding: 1em;
+    text-align: left;
+}
+
+.value-item h3 {
+    margin-top: 0;
+    font-family: var(--font-heading);
+    font-weight: bold;
+}
+
+.value-item p {
+    font-family: var(--font-body);
+    font-size: var(--text-base); /* Standardized paragraph font size */
+}
+
+
+/*Aside Styles*/
+
+
+aside {
+    background: gray;
+    margin: auto;
+    width: 15%;
+}
+
+.left {
+    float: left;
+}
+
+.left img {
+    width: 15vw;
+    height: auto;
+}
+
+.right {
+    float: right;
+}
+
+/*Article Styles*/
+
+article {
+    font-family: var(--font-body);
+    font-size: var(--text-lg);
+    margin: 1em auto;
+    width: 60%;
+}
+
+/*Video Styles*/
+
+.video {
+    text-align: center;
+}
+
+/*Button Styles*/
+
+.join_button_section {
+    width: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px;
+}
+
+.join_button_section h2 {
+    font-size: var(--text-h3);
+}
+
+.join_button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 30vw;
+    height: 6vw;
+    color: var(--color-text-light);
+    text-decoration: none;
+    border-radius: .5vw;
+    background: linear-gradient(150deg, black, #555);
+    transition: background 0.3s, text-decoration 0.3s;
+}
+
+
+.join_button:hover {
+    background: linear-gradient(150deg, black, #555);
+    text-decoration: underline;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+
+
+.join_button:visited,
+.join_button:active,
+.join_button:link {
+    color: var(--color-text-light);
+    text-decoration: none;
+}
+
+#toggleCredits {
+    background-color: var(--color-dark-gray);
+    color: var(--color-text-light);
+    border: none;
+    padding: 0.5em 1em;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+#toggleCredits:hover {
+    background-color: var(--color-dark-gray-hover);
+}
+
+/*Contact Form Styles*/
+
+.contact {
+    background-color: #fff;
+    padding: 2em;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    margin-bottom: 0.5em;
+    font-weight: bold;
+}
+
+input[type="text"],
+input[type="email"],
+textarea {
+    padding: 0.5em;
+    margin-bottom: 1em;
+    border: 1px solid var(--color-border-medium);
+    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+textarea {
+    resize: vertical;
+}
+
+button {
+    padding: 0.7em;
+    border: none;
+    border-radius: 4px;
+    background-color: var(--color-primary-blue);
+    color: var(--color-text-light);
+    font-size: var(--text-base);
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: var(--color-primary-blue-dark);
+}
+
+fieldset {
+    border-radius: 4px;
+    border: 1px solid var(--color-border-medium);
+}
+
+/*Table Styles*/
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+th, td {
+    border: 1px solid var(--color-border-light);
+    padding: 8px;
+    text-align: left;
+}
+th {
+    background-color: var(--color-background-medium);
+}
+
+/*Footer Styles*/
+
+footer {
+    padding: 5vw 0 5vw 0;
+    margin: 0; /* Changed from margin:; */
+    width: 100%;
+    text-align: center;
+    font-family: var(--font-body);
+    font-size: var(--text-sm); /* Using variable */
+    background-size: cover;
+    background: url(../images/mark-basarab-1OtUkD_8svc-unsplash.jpg) no-repeat center center;
+}
+
+.footer_content {
+    width: auto;
+    padding: 2vw;
+    background: rgba(255, 255, 255, 0.7);
+}
+
+footer a:link {
+    color: var(--color-text-primary);
+    text-decoration: none;
+}
+
+footer a:hover {
+    color: var(--color-text-primary);
+    text-decoration: underline;
+}
+
+footer a:visited {
+    color: var(--color-text-primary);
+    text-decoration: none;
+}
+
+footer a:active {
+    color: var(--color-text-primary);
+    text-decoration: none;
+}
+
+/* Credits list styles */
+#creditsList {
+    list-style-type: none;
+    padding: 0;
+    margin: 1em 0 0;
+}
+
+#creditsList.hidden {
+    display: none;
+}
+
+/* Medium screens (tablets) */
+@media (min-width: 768px) and (max-width: 991px) {
+    .mcgovern_design_header {
+        width: 100%;
+        height: 30vw;
+    }
+
+    .services_header {
+        width: 100%;
+        height: 30vw;
+    }
+    
+    .about_header {
+        width: 100%;
+        height: 30vw;
+    }
+
+    .contact_header {
+        width: 100%;
+        height: 30vw;
+    }
+
+    .privacy_header {
+        width: 100%;
+        height: 30vw;
+    }
+
+    .terms_header {
+        width: 100%;
+        height: 30vw;
+    }
+
+    nav ul {
+        align-items: center;
+        padding: 1em;
+    }
+
+    nav ul li {
+        font-size: 3vw;
+        margin-right: 1em;
+        margin-bottom: 0;
+    }
+
+    header h1 {
+        font-size: 4em;
+        padding: 1em;
+        margin: 1em;
+    }
+
+    aside {
+        width: 45%;
+        float: none;
+        margin: 1em auto;
+    }
+    .right {
+        float: none;
+    }
+
+    .left {
+        float: none;
+    }
+
+    article {
+        width: 90%;
+        margin: 1em auto;
+    }
+
+    footer {
+        width: 90%;
+        margin: 1em auto;
+    }
+}
+
+/* Small screens (phones) */
+@media (max-width: 767px) {
+
+    .mcgovern_design_header {
+        display: flex;
+        width: 100%;
+        height: 60vw;
+    }
+
+    nav ul {
+        display: flex;
+        justify-content: center;
+        padding: 0;
+        margin: 0;
+    }
+
+    nav ul li {
+        margin-right: 1em;
+        margin-bottom: 0;
+    }
+
+    nav ul li a:link {
+        font-size: 3vw;
+        color: var(--color-text-primary);
+        text-decoration: none;
+    }
+
+    nav ul li a:hover {
+        color: var(--color-text-primary);
+        text-decoration: underline;
+    }
+
+    nav ul li a:visited {
+        color: var(--color-text-primary);
+        text-decoration: none;
+    }
+
+    nav ul li a:active {
+        color: var(--color-text-primary);
+        text-decoration: none;
+    }
+
+    .mcgovern_design_header h1 {
+        font-size: 3em;
+        padding: 5vw;
+        margin: 5vw;
+        align-items: center;
+    }
+
+    section {
+        width: 100%;
+    }
+
+    aside {
+        width: 100%;
+        float: none;
+        margin: 1em auto;
+    }
+
+    .right {
+        float: none;
+    }
+
+    .left {
+        float: none;
+    }
+
+    article {
+        font-size: 2em;
+        width: 100%;
+        margin: 1em auto;
+    }
+
+    footer {
+        width: 100%;
+        margin: 1em auto;
+    }
+}
+
+/* REMOVED the extra '}' curly brace that was here. 
+    Your @media (max-width: 767px) block is now correctly closed.
+*/
