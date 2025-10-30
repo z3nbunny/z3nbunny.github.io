@@ -693,6 +693,91 @@ footer a:active {
         width: 100%;
         margin: 1em auto;
     }
+
+    /* ADD THESE STYLES INSIDE YOUR @media (max-width: 767px) { ... } BLOCK */
+
+    /* --- Header Fix --- */
+    /* Make header text smaller and more readable on mobile */
+    header h1 {
+        font-size: var(--text-h2); /* Use h2 size for h1 on mobile */
+    }
+
+    header h2 {
+        font-size: var(--text-h3); /* Use h3 size for h2 on mobile */
+        padding: 0vw 1vw 5vw 1vw; /* Add more padding at the bottom */
+    }
+
+
+    /* --- About Section Fix --- */
+    /* This makes the "About" section stack vertically */
+    .about_section {
+        flex-direction: column; /* Stack photo on top of text */
+        max-width: 90vw;        /* Let it use most of the screen */
+        margin: 5vh auto;       /* Give it vertical space */
+    }
+
+    .about_photo {
+        margin: 5vh 0 0 0; /* Adjust margin for stacking */
+    }
+
+    .about_photo img {
+        width: 40vw;  /* Make photo much larger on mobile (e.g., 40% of screen) */
+        height: 40vw; /* Keep it a circle */
+    }
+
+    .about_text {
+        max-width: 90vw;     /* Let text use the full width */
+        margin: 3vh 0 0 0;   /* New margin for stacked layout */
+        text-align: center;  /* Center-align bio text on mobile */
+    }
+
+    .bio {
+        font-size: var(--text-base); /* Use 1rem for main body text */
+    }
+
+    .social_nav {
+        margin-top: 2em; /* Give icons more space */
+    }
+
+    .social_nav img {
+        width: 10vw; /* Make social icons larger and easier to tap */
+    }
+
+
+    /* --- Work Section Fix --- */
+    /* This makes your portfolio pieces larger on mobile */
+    .work_example_section {
+        width: 90%; /* Use more of the screen width */
+    }
+
+    .work_example {
+        max-width: 80vw; /* Let project examples be much wider */
+    }
+
+    .work_example img {
+        width: 70vw; /* Make project images large */
+        height: auto;
+    }
+
+    .work_example h3 {
+        font-size: var(--text-lg); /* 1.125rem */
+    }
+
+    .work_example p {
+        font-size: var(--text-base); /* 1rem */
+    }
+
+    /* --- Article/Aside Fix (if you use them) --- */
+    /* This makes the old 'aside' and 'article' full-width */
+    aside {
+        width: 90%;
+        float: none;
+    }
+
+    article {
+        width: 90%;
+        font-size: var(--text-lg);
+    }
 }
 
 /* REMOVED the extra '}' curly brace that was here. 
