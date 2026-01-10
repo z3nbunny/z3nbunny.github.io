@@ -10,6 +10,7 @@
     
     <script src="./js/credits.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="./js/accordion_script.js"></script>
 </head>
 <body>
     <header class="mcgovern_design_header">
@@ -46,12 +47,12 @@
                         </li>
                         <li>
                             <a href="https://www.linkedin.com/in/mcgovern-design/">
-                                <img src="./images/334-3347140_font-linkedin-white-linkedin-sign-white-1485242246.jpg" alt="My LinkedIn Profile" />
+                                <img src="./images/linkedin_logo.png" alt="My LinkedIn Profile" />
                             </a>
                         </li>
                         <li>
                             <a href="https://www.facebook.com/zenbunny">
-                                <img src="./images/90-902640_facebook-logo-circle-black-transparent-logo-fb-vector.jpg" alt="My Facebook Profile" />
+                                <img src="./images/Facebook-Logo.png" alt="My Facebook Profile" />
                             </a>
                         </li>
                     </ul>
@@ -61,51 +62,131 @@
 
         <section class="my_work_section">
             <div class="my_work_section_header" id="websites_header">
-                <h2 class="my_work_title">My Websites</h2>
+                <h1 class="my_work_title">Case Studies</h1>
             </div>
-            <h2 class="subsection_label">Websites</h2>
-            <section class="work_example_section">
-            <a href="http://batcitybites.com" target="_blank">
-                <div class="work_example">
-                    <img src="./images/Bat_city_bites_logo.png" alt="The logo for Bat City Bites">
-                   <h3>Bat City Bites</h3>
-                   <p>
-                        As Creative Director, I crafted the website, labels, and graphics for this brand of natural chocolate protein bites. My focus was on clean, friendly design to ensure  cohesive branding.</p>
+
+            <!-- Case study testing grounds-->
+
+            <div class="case-study-item">
+    
+                <button class="case-study-trigger" id="bat-city-bites-trigger" aria-expanded="false" aria-controls="content-1">
+    
+                    <div class="case-study-trigger-content">
+                        <img src="./images/Bat_city_bites_logo.png" alt="Bat City Bites Logo" class="case-study-logo">
+        
+                        <div class="case-study-trigger-text">
+                            <h3 class="case-study-title">Bat City Bites</h3>
+                            <p class="case-study-subtitle">From Idea to Retail Shelves</p>
+                        </div>
+                    </div>
+    
+                    <span class="case-study-caret"></span>
+                </button>
+    
+                <div class="case-study-content" id="case-study-content-1" role="region">
+                    <div class="case-study-content-inner">
+                        <div class="case-study-feature">
+                            <div class="case-study-image">
+                                <img src="./images/batcitybites_on_laptop.jpg" alt="Bat City Bites website on a laptop">
+                            </div>
+                            <div class="case-study-text">
+                                <h4>The Challenge</h4>
+                                <p>
+                                    As a co-owner and creative director for Bat City Bites, my challenge was to build an entire brand identity from the ground up. The startup needed a professional logo, a cohesive visual style, print-ready product labels to secure distribution in physical retail locations. We also needed a professional website to serve as the brand's digital "home base."
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="case-study-feature">
+                            <div class="case-study-image">
+                                <img src="./images/batcitybites_protein_bite_drizzle.jpg" alt="Bat City Bites website on a laptop">
+                            </div>
+                            <div class="case-study-text">
+                                <h4>The Solution</h4>
+                                <p>
+                                    I directed and executed the brand's complete creative strategy. The goal was a clean, friendly, and energetic identity that felt both professional and local.
+                                </p>
+                                <ul>
+                                    <li>
+                                        <strong>Brand Identity:</strong> Developed the complete visual foundation by directing the brand's evolution from conceptual sketches to a final, high-energy identity and typography system designed to command attention on competitive retail shelves.
+                                    </li>
+                                    <li>
+                                        <strong>Packaging Design:</strong> Created all print and digital assets, including the final, FDA-compliant product labels designed to stand out on a competitive retail shelf..
+                                    </li>
+                                    <li>
+                                        <strong>Web Development:</strong> Built a fast, mobile-first website to serve as the central hub for product information and sales.
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="case-study-feature">
+                            <div class="case-study-image">
+                                <img src="./images/batcitybites_on_a_hike.jpg" alt="Bat City Bites website on a laptop">
+                            </div>
+                            <div class="case-study-text">
+                                <h4>The Result</h4>
+                                <p>
+                                    The cohesive brand and packaging strategy was a success, securing product placement in 4 retail stores across Austin. Although the company is no longer in operation this project stands as a complete case study in building a physical product brand from concept to launch.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </a>
-            <a href="http://cropcrusaders.com" target="_blank">
-                <div class="work_example">
-                    <img src="./images/Crop_Crusaders_Logo.png" alt="The logo for Crop Crusaders, a board game.">
-                    <h3>Crop Crusaders</h3>
-                    <p>
-                        As Game Designer & Web Developer, I crafted a WordPress site to showcase the unique features of this strategic board game plus build excitement and community for its launch.</p>
-                </div>
-            </a>
-            </section>
-        </section> <section class="my_work_section">
-            <div class="my_work_section_header" id="graphic_design_header">
-                <h2 class="my_work_title">My Graphic Design</h2>
+
             </div>
-            <h2 class="subsection_label">Graphic Design</h2>
-            <section class="work_example_section">
-            <a href="http://batcitybites.com" target="_blank">
-                <div class="work_example">
-                    <img src="./images/Bat_city_bites_logo.png" alt="The logo for Bat City Bites">
-                   <h3>Bat City Bites</h3>
-                   <p>
-                        As Creative Director, I crafted the website, labels, and graphics for this brand of natural chocolate protein bites. My focus was on clean, friendly design to ensure  cohesive branding.</p>
+
+            <div class="case-study-item">
+    
+                <button class="case-study-trigger" id="browser-game-trigger" aria-expanded="false" aria-controls="game-content-panel">
+                    <div class="case-study-trigger-content">
+                        <img src="./images/game_icon_pink.png" alt="Platformer Icon" class="case-study-logo">
+        
+                        <div class="case-study-trigger-text">
+                            <h3 class="case-study-title">Physics Engine</h3>
+                            <p class="case-study-subtitle">Vanilla JS // Prototype</p>
+                        </div>
+                    </div>
+                    <span class="case-study-caret"></span>
+                </button>
+    
+                <div class="case-study-content" id="game-content-panel" role="region">
+                    <div class="case-study-content-inner">
+                        
+                        <div class="game-intro-text" style="padding: 2em 2em 1em 2em; text-align: center;">
+                            <p style="max-width: 600px; margin: 0 auto;">
+                                A custom-built 2D physics engine handling collision detection, velocity, and state management. 
+                                <span class="desktop-instruction"><strong>Use Arrow Keys</strong> to move & jump.</span>
+                                <span class="mobile-instruction" style="display:none;"><strong>Tap Fullscreen</strong> to play.</span>
+                            </p>
+                        </div>
+
+                        <div id="game-stage-container">
+                            
+                            <canvas id="gameCanvas" width="800" height="450"></canvas>
+
+                            <div id="game-overlay">
+                                <div class="overlay-content">
+                                    <h4>Pink Quadruped Demo</h4>
+                                    <button id="start-engine-btn">Initialize Engine</button>
+                                </div>
+                            </div>
+
+                            <div id="mobile-controls" class="hidden">
+                                <button id="btn-left" class="touch-btn d-pad">◄</button>
+                                <button id="btn-right" class="touch-btn d-pad">►</button>
+                                <button id="btn-jump" class="touch-btn action-btn">A</button>
+                                <button id="btn-fullscreen-exit" class="touch-btn system-btn">Exit</button>
+                            </div>
+
+                            <button id="btn-fullscreen-enter">⛶ Full Screen</button>
+
+                        </div>
+
+                    </div>
                 </div>
-            </a>
-            <a href="http://cropcrusaders.com" target="_blank">
-                <div class="work_example">
-                    <img src="./images/Crop_Crusaders_Logo.png" alt="The logo for Crop Crusaders, a board game.">
-                    <h3>Crop Crusaders</h3>
-                    <p>
-                        As Game Designer & Web Developer, I crafted a WordPress site to showcase the unique features of this strategic board game plus build excitement and community for its launch.</p>
-                </div>
-            </a>
-            </section>
-        </section>
+            </div>
+        </section> 
     </main> <footer>
         <div class="footer_content">
             <p>&copy; 2024 McGovern.Design | All rights reserved.</p>
