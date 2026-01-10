@@ -1,14 +1,18 @@
 /*
 McGovern.Design by David McGovern
-1/19/2026
+Refactored: 1/19/2026
 */
 
-/* CSS Variables (Custom Properties) */
+/* =========================================
+   1. VARIABLES & CONFIGURATION
+   ========================================= */
 :root {
+    /* Typography */
     --font-heading: 'Montserrat', Arial, Helvetica, sans-serif;
     --font-body: 'Open Sans', Arial, Helvetica, sans-serif;
     --font-serif: 'Lora', Georgia, 'Times New Roman', serif;
     
+    /* Colors */
     --color-text-primary: black;
     --color-text-light: white;
     --color-background-light: #f9f9f9;
@@ -20,196 +24,205 @@ McGovern.Design by David McGovern
     --color-dark-gray: #444;
     --color-dark-gray-hover: #555;
     
-    /* Type Scale */
-    --text-base: 1rem;      /* 16px default */
-    --text-sm: 1vw;    /* 22.7px */
-    --text-lg: 2vw;    /* 22.7px */
-    --text-p1: 2vw;     /*22.7px*/
-    --text-h3: 2vw;      /* 24px */
-    --text-h2: 2.5vw;     /* 34px */
-    --text-h1: 4vw;        /* 45.4px */
+    /* Type Scale (Desktop Default) */
+    --text-base: 1rem;       /* 16px */
+    --text-sm: 1vw;          /* ~14-16px depending on screen */
+    --text-lg: 1.125rem;     /* Fixed readability size */
+    --text-p1: 2vw;          /* Scalable body text */
+    --text-h3: 2vw;
+    --text-h2: 2.5vw;
+    --text-h1: 4vw;
 
-    --text-h2-mobile: 4vw;
-    --text-h1-mobile: 5vw;
+    /* Mobile Type Scale Overrides */
+    --text-h2-mobile: 5vw;
+    --text-h1-mobile: 7vw;
 }
 
-/*General Styles*/
-h1 {
-    font-family: var(--font-heading);
-    font-weight: 500;
-    font-size: var(--text-h1);
+/* =========================================
+   2. GLOBAL RESET & TYPOGRAPHY
+   ========================================= */
+body {
     margin: 0;
+    padding: 0;
+    font-family: var(--font-body);
+    color: var(--color-text-primary);
 }
 
-h2 {
+h1, h2, h4 {
     font-family: var(--font-heading);
-    font-weight: 500;
-    font-size: var(--text-h2);
     margin: 0;
 }
 
 h3 {
     font-family: var(--font-serif);
-    font-weight: 500;
-    font-size: var(--text-h3);
     margin: 0 auto;
 }
 
-h4 {
-    font-family: var(--font-heading);
-    font-weight: 600;
-    font-size: var(--text-h3);
-    text-align: center;
-    margin: 0 auto;
-}
+h1 { font-weight: 500; font-size: var(--text-h1); }
+h2 { font-weight: 500; font-size: var(--text-h2); }
+h3 { font-weight: 500; font-size: var(--text-h3); }
+h4 { font-weight: 600; font-size: var(--text-h3); text-align: center; }
 
 p {
     font-family: var(--font-body);
     font-weight: 400;
     font-size: var(--text-p1);
-    line-height: 1.6; /* Added for readability */
-    margin: 0px;
+    line-height: 1.6;
+    margin: 0;
 }
 
-a:link {
-    color: var(--color-text-primary);
-    text-decoration: none;
+a { color: var(--color-text-primary); text-decoration: none; }
+a:hover { text-decoration: underline; }
+a:visited, a:active { color: var(--color-text-primary); }
+
+img { max-width: 100%; height: auto; }
+
+/* =========================================
+   3. UI COMPONENTS
+   ========================================= */
+
+/* --- Buttons --- */
+button {
+    cursor: pointer;
+    font-family: var(--font-heading);
 }
 
-a:hover {
-    color: var(--color-text-primary);
-    text-decoration: underline;
-}
-
-a:visited {
-    color: var(--color-text-primary);
-    text-decoration: none;
-}
-
-a:active {
-    color: var(--color-text-primary);
-    text-decoration: none;
-}
-
-/*Navigation Styles*/
-img.logo {
-    width: 10vw;
-    height: auto;
-}
-
-img.logo:hover {
-    filter: drop-shadow(0 0 5px rgba(0,0,0,0.4)); /* Added shadow values */
-}
-
-/*Header Styles*/
-
-.mcgovern_design_header {
-    margin: 0px auto;
+.join_button {
     display: flex;
-    flex-direction: column; /* Adjusts content to stack vertically */
     justify-content: center;
     align-items: center;
-    /* Removed "magic number" calc(), using center instead */
-    /* Note: updated image path */
-    background: url(../images/teemu-paananen-OOE4xAnBhKo-unsplash.jpg) no-repeat center center / cover;
-    width: 100%;
+    width: 30vw;
+    height: 6vw;
+    color: var(--color-text-light) !important; /* Force override for links */
+    text-decoration: none;
+    border-radius: .5vw;
+    background: linear-gradient(150deg, black, #555);
+    transition: background 0.3s, transform 0.2s;
 }
 
-header {
-    padding: 2em 0 2em 0;
+.join_button:hover {
+    text-decoration: none;
+    animation: pulse 1.5s ease-in-out infinite;
 }
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* --- Forms --- */
+.contact {
+    background-color: #fff;
+    padding: 2em;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+}
+
+input[type="text"], input[type="email"], textarea {
+    padding: 0.5em;
+    margin-bottom: 1em;
+    border: 1px solid var(--color-border-medium);
+    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box;
+    font-family: var(--font-body);
+}
+
+textarea { resize: vertical; }
+
+button[type="submit"] {
+    padding: 0.7em;
+    border: none;
+    border-radius: 4px;
+    background-color: var(--color-primary-blue);
+    color: var(--color-text-light);
+    transition: background-color 0.3s;
+}
+
+button[type="submit"]:hover { background-color: var(--color-primary-blue-dark); }
+
+/* --- Tables --- */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+th, td {
+    border: 1px solid var(--color-border-light);
+    padding: 8px;
+    text-align: left;
+}
+th { background-color: var(--color-background-medium); }
+
+/* =========================================
+   4. LAYOUT: HEADER & NAV
+   ========================================= */
+.mcgovern_design_header {
+    width: 100%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: url('../images/teemu-paananen-OOE4xAnBhKo-unsplash.jpg') no-repeat center center / cover;
+}
+
+header { padding: 2em 0; }
 
 .header_text {
     background-color: rgba(255, 255, 255, 0.7);
-    padding: 0em;
-    margin: 0em;
+    padding: 1em;
     text-align: center;
 }
 
-.slogan {
-    text-align: center;
-}
+.slogan { text-align: center; }
 
-header h1 {
-    font-size: var(--text-h1); /* Using variable */
-    padding: 2vw 2vw 1vw 2vw;
-    margin: 0em;
-}
+img.logo { width: 10vw; height: auto; transition: filter 0.3s; }
+img.logo:hover { filter: drop-shadow(0 0 5px rgba(0,0,0,0.4)); }
 
-header h2 {
-    font-size: var(--text-h2); /* Using variable */
-    padding: 0vw 1vw 2vw 1vw;
-    margin: 0em;
-}
+/* Social Nav */
+.social_nav { text-align: center; margin-top: 1em; }
+.social_nav ul { padding: 0; margin: 0; list-style: none; }
+.social_nav li { display: inline-block; margin: 0 0.5em; }
+.social_nav img { width: 3vw; height: auto; }
 
-/*About Styles*/
+/* =========================================
+   5. PAGE SECTIONS
+   ========================================= */
 
+/* --- About Section --- */
 .about_section {
     display: flex;
     align-items: center;
-    justify-content: space-between; /* Distributes space between elements */
-    max-width: 80vw; /* Maximum width for the entire section */
-    margin: 0 auto; /* Centers the section horizontally */
+    justify-content: space-between;
+    max-width: 80vw;
+    margin: 5vh auto;
 }
 
 .about_photo {
-    flex: 0;
-    display: flex;
-    justify-content: center; /* Centers the photo within its container */
-    margin: 10vh 0 0 0;
+    flex: 0 0 auto;
+    margin-right: 3vw;
 }
 
 .about_photo img {
     width: 20vw;
     height: 20vw;
-    object-fit: cover; /* Crops the image to fit the square */
-    object-position: top center; /* Centers the face in the upper third */
-    border-radius: 50%; /* Optional: Makes the image circular */
+    object-fit: cover;
+    object-position: top center;
+    border-radius: 50%;
 }
 
-.about_text {
-    flex: 1;
-    max-width: 70vw; /* Maximum width for the text */
-    margin: 10vh 0 0 3vw;
-}
+.about_text { flex: 1; }
 
-.bio {
-    font-family: var(--font-body);
-    font-size: var(--text-lg); /* Using variable, 1.125rem */
-}
+.bio { font-size: var(--text-lg); }
 
-/* Semantic social nav list styles */
-.social_nav {
-    text-align: center;
-    margin-top: 1em;
-}
-
-.social_nav ul {
-    padding: 0;
-    margin: 0;
-    list-style-type: none; /* Removes bullets */
-}
-
-.social_nav li {
-    display: inline-block; /* Aligns icons horizontally */
-    margin: 0 0.5em; /* Space between icons */
-}
-
-.social_nav img {
-    width: 3vw; /* Adjust icon size */
-    height: auto;
-}
-
-/*Case Studies*/
-
-.my_work_section {
-    margin: 10vh 0;
-}
+/* --- Work / Case Studies Container --- */
+.my_work_section { margin: 10vh 0; }
 
 .my_work_section_header {
-    margin: 0px auto;
-    position: relative;
-    background-size: cover;
     width: 100%;
     height: 10vw;
     display: flex;
@@ -217,478 +230,228 @@ header h2 {
     align-items: center;
 }
 
-#websites_header {
-    background: url() no-repeat center center;
-}
-
-.subsection_label {
-    text-align: center;
-    display: none;
-}
-
 .my_work_title {
-    background-color: rgba(0, 0, 0, 0); /* 70% transparent black background */
-    padding: 2vw 2vw;
+    padding: 2vw;
     text-align: center;
-    margin: 0;
     font-weight: 300;
     font-size: 4vw;
 }
 
-.work_example img {
-    width: 20vw;
-    height: auto;
-    border-radius: 10%;
-}
-
-.work_example_section {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: flex-start; /* Changed from center to align text */
-    gap: 2em; /* Space between the two elements */
-    padding: 2em 0; /* Adjust padding to your preference */
-    text-align: center; /* Center the text below the images */
-    margin: 0px auto;
-    width: 80%;
-}
-
-.work_example {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    max-width: 25vw;
-}
-
-.work_example p {
-    margin-top: 0.5em; /* Space between image and text */
-    font-size: var(--text-sm); /* Using variable, 0.875rem */
-}
-
-.work_example_section a:hover {
-    color: var(--color-text-primary);
-    text-decoration: none;
-}
-
-/*
-=====================================================
-Case Study Accordion
-=====================================================
-*/
-
-/* This centers the whole component on your page */
+/* =========================================
+   6. ACCORDION SYSTEM (The Core Logic)
+   ========================================= */
 .case-study-container {
-    max-width: 900px; /* Or whatever width you like */
-    margin: 3em auto; /* Centers it */
+    max-width: 900px;
+    margin: 3em auto;
     border: 1px solid #ddd;
     border-radius: 8px;
-    overflow: hidden; /* Important for rounded corners */
+    overflow: hidden;
 }
 
-.case-study-item {
-    /* Each item has a border on the bottom */
-    border-bottom: 1px solid #ddd;
-}
-.case-study-item:last-child {
-    /* Remove border from the last item */
-    border-bottom: none;
-}
+.case-study-item { border-bottom: 1px solid #ddd; }
+.case-study-item:last-child { border-bottom: none; }
 
-/* This is the 'bar' you click (the full horizontal section) */
+/* The Trigger Bar */
 .case-study-trigger {
-    /* --- Basic Setup --- */
     display: flex;
-    justify-content: space-between; /* Pushes title and caret apart */
-    align-items: flex-start;      /* Moves items to the TOP */
     width: 100%;
-    
-    /* --- Styling --- */
-    background-color: #f9f9f9; /* A light, minimal background */
     padding: 2em;
     border: none;
     cursor: pointer;
-    text-align: left;
-    
-    /* --- Typography --- */
-    font-family: var(--font-heading);
+    background-color: #f9f9f9;
     color: var(--color-text-primary);
-
-    /* --- Transition --- */
     transition: background-color 0.2s ease;
 }
 
-.case-study-trigger:hover {
-    background-color: #f1f1f1;
-}
+.case-study-trigger:hover { background-color: #f1f1f1; }
 
-.case-study-title {
-    margin: 0;
-    font-size: var(--text-h3);
-}
-
-/* The Caret */
+/* The Caret Icon */
 .case-study-caret {
-    /* Sizing */
     width: 0.8em;
     height: 0.8em;
-    
-    /* Border creates the caret shape */
     border-bottom: 3px solid var(--color-text-primary);
     border-right: 3px solid var(--color-text-primary);
-    
-    /* Puts it in the top-right */
-    margin-top: 0.5em; 
-    
-    /* Rotation for "down" state */
     transform: rotate(45deg);
-    
-    /* This makes the rotation smooth! */
     transition: transform 0.4s ease;
+    margin-top: 0.5em; 
 }
 
-/* The 'click' state (caret rotation) */
-.case-study-trigger[aria-expanded="true"] .case-study-caret {
-    /* Rotates to point "up" */
-    transform: rotate(-135deg); 
-}
-
-/*
-=====================================================
-The Smooth Animation
-=====================================================
-*/
-
-/* This is the hidden content area */
+/* Animation Logic */
 .case-study-content {
-    /* This is the "magic" for smooth animation */
     display: grid;
-    grid-template-rows: 0fr; /* Starts CLOSED (0 fractions of height) */
-    
-    /* This is the smooth transition! */
+    grid-template-rows: 0fr; /* Closed state */
     transition: grid-template-rows 0.5s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-/* The OPEN state */
 .case-study-trigger[aria-expanded="true"] + .case-study-content {
-    /* Expands to 1 fraction (its full, natural height) */
-    grid-template-rows: 1fr;
+    grid-template-rows: 1fr; /* Open state */
 }
 
-/* This inner wrapper is required for the grid animation */
-.case-study-content-inner {
-    overflow: hidden;
-    background: #fff;
-}
+.case-study-content-inner { overflow: hidden; background: #fff; }
 
-/* General Styles for the Values Section */
-.values-section {
-    margin: 2em auto;
-    padding: 2em;
-    max-width: 80%;
-    text-align: center;
-}
-
-.values-section h2 {
-    font-family: var(--font-body);
-    font-size: var(--text-h2);
-    margin-bottom: 1em;
-}
-
-.values-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(2, auto);
-    gap: 1em;
-    justify-content: center;
-}
-
-.values-grid .value-item:nth-child(4),
-.values-grid .value-item:nth-child(5) {
-    grid-column: span 1;
-}
-
-.values-grid .value-item:nth-child(1),
-.values-grid .value-item:nth-child(2),
-.values-grid .value-item:nth-child(3) {
-    grid-column: span 1;
-}
-
-.value-item {
-    background-color: var(--color-background-light);
-    border: 1px solid var(--color-border-light);
-    border-radius: 8px;
-    padding: 1em;
-    text-align: left;
-}
-
-.value-item h3 {
-    margin-top: 0;
-    font-family: var(--font-heading);
-    font-weight: bold;
-}
-
-.value-item p {
-    font-family: var(--font-body);
-    font-size: var(--text-base); /* Standardized paragraph font size */
-}
-
-/* --- Case Study Content Layout --- */
-
-.case-study-layout {
+/* Content Layout (Zig-Zag) */
+.case-study-feature {
     display: flex;
-    flex-wrap: wrap; /* Lets it stack on mobile */
+    align-items: center;
     gap: 2em;
+    margin-bottom: 3em;
+    padding: 1.5em 2em;
 }
 
-.case-study-text {
-    flex: 2; /* Text takes 2/3 of the space */
-    min-width: 300px; /* Prevents it from getting too squished */
-}
+.case-study-feature:nth-child(even) { flex-direction: row-reverse; }
 
-.case-study-visuals {
-    flex: 1; /* Visuals take 1/3 of the space */
-    min-width: 250px;
-}
+.case-study-feature .case-study-image,
+.case-study-feature .case-study-text { flex: 1; min-width: 300px; }
 
-/* Style for the images inside the visual column */
-.case-study-visuals img {
-    width: 100%;
-    height: auto;
-    margin-bottom: 1em;
-    border: 1px solid #eee; /* A subtle border */
+.case-study-feature img {
     border-radius: 4px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
-/* On mobile, make it stack vertically */
-@media (max-width: 767px) {
-    .case-study-layout {
-        flex-direction: column;
-    }
+/* List Styles inside Case Studies */
+.case-study-text ul { list-style: none; padding: 0; margin: 1.5em 0; }
+
+.case-study-text li {
+    position: relative;
+    padding-left: 1em;
+    margin-bottom: 1.2em;
+    font-size: var(--text-base);
 }
 
-/*
-=====================================================
-Case Study Specific Styles
-=====================================================
-*/
+.case-study-text li strong {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    color: black;
+    display: block;
+    margin-bottom: 0.2em;
+}
 
-/* This is the hero image for your button */
+/* =========================================
+   7. PROJECT SPECIFIC STYLES
+   ========================================= */
+
+/* --- Project 1: Bat City Bites --- */
 #bat-city-bites-trigger {
     background-image: linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0)), url('../images/Congress-Ave-Bridge-Bats-sunsetAmanda-Stronza-1407x938.jpg');
-    background-size: 100% auto;
+    background-size: 150% auto; /* Middle-third crop */
     background-position: center center;
     background-repeat: no-repeat;
-    min-height: 6vw; /* Give it some height */
-    position:relative;
+    min-height: 200px;
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
-    /* These override the default styles to make it look good */
-    color: white; /* Make text white to stand out on the overlay */
-    border: none;
-}
-
-/* This styles the caret to be white */
-#bat-city-bites-trigger .case-study-caret {
-    border-color: white;
-}
-
-.case-study-subtitle {
-    margin: 0;
-    padding: 0;
-    font-family: var(--font-body);
-    font-size: var(--text-sm);
     color: white;
-    font-weight: 300;
-    opacity: 0.9; /* Makes it slightly less prominent than the title */
 }
 
-/* Center and Enlarge the Trigger Content */
 #bat-city-bites-trigger .case-study-trigger-content {
     display: flex;
-    align-items: center;      /* Forces vertical centering */
-    justify-content: center;   /* Forces horizontal centering */
-    width: auto; 
-    gap: 3vw;                 /* Space also scales with screen width */
+    align-items: center;
+    justify-content: center;
+    gap: 3vw;
+    width: auto;
 }
 
-/* Enlarge the Text */
-#bat-city-bites-trigger .case-study-title {
-    font-size: 4vw; 
-    line-height: 1.1;         /* Tighter line height for large headings */
-    text-align: left;
-    margin: 0;
-}
-
-#bat-city-bites-trigger .case-study-subtitle {
-    font-size: 2.5vw;         /* Scaling subtitle */
-    margin-top: 0.2vw;
-    color: white;
-}
-
-/* Unified VW Scaling for the Logo */
-#bat-city-bites-trigger .case-study-logo {
-    width: 12vw;               /* Now scales exactly like the text */
-    height: auto;
-    margin: 0;                /* Remove all old margins */
-}
+#bat-city-bites-trigger .case-study-logo { width: 12vw; margin: 0; }
+#bat-city-bites-trigger .case-study-title { font-size: 4vw; line-height: 1.1; margin: 0; text-align: left; }
+#bat-city-bites-trigger .case-study-subtitle { font-size: 2vw; margin-top: 0.2vw; color: white; opacity: 0.9; }
 
 #bat-city-bites-trigger .case-study-caret {
     position: absolute;
-    right: 4vw;         /* Pinned to the right side */
+    right: 4vw;
     top: 50%;
-    transform: translateY(-50%) rotate(45deg); /* Perfect vertical center */
     margin: 0;
+    border-color: white;
+    transform: translateY(-50%) rotate(45deg);
 }
-
-/* Rotation for expanded state */
 #bat-city-bites-trigger[aria-expanded="true"] .case-study-caret {
     transform: translateY(-50%) rotate(-135deg);
 }
 
-/* Style the list container */
-.case-study-text ul {
-    list-style: none; /* Removes the default bullet */
-    padding: 0;
-    margin: 1.5em 0;
-}
-
-/* Style each list item */
-.case-study-text li {
-    position: relative;
-    padding-left: 1em; /* Space for the custom bullet */
-    margin-bottom: 1.2em; /* Vertical breathing room between points */
-    font-family: var(--font-body);
-    font-size: var(--text-base);
-    line-height: 1.6;
-}
-
-/* Style the bolded labels (e.g., Brand Identity) */
-.case-study-text li strong {
-    font-family: var(--font-heading); /* Montserrat */
-    font-weight: 600;
-    color: black;
-    display: block; /* Moves the label to its own line for better hierarchy */
-    margin-bottom: 0.2em;
-}
-
-/* --- Soft Pop Trigger Styles --- */
+/* --- Project 2: Browser Platformer --- */
 #browser-game-trigger {
-    /* The Soft Pop Gradient: Warm White to Blush Pink */
-    background: linear-gradient(135deg, #fff5f5 0%, #fce4ec 100%);
+    background: linear-gradient(135deg, #fff5f5 0%, #fce4ec 100%); /* Soft Pop */
     position: relative;
     min-height: 200px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: none;
 }
 
-/* Dark Chocolate Text */
-#browser-game-trigger .case-study-title {
-    color: #3e2723; 
-    font-size: 3.5vw;
-    margin: 0;
-    line-height: 1.1;
+#browser-game-trigger .case-study-trigger-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3vw;
 }
 
-/* Magenta Monospace Subtext */
-#browser-game-trigger .case-study-subtitle {
-    color: #d81b60;
-    font-family: 'Courier New', monospace;
-    font-weight: bold;
-    font-size: 1.4vw;
-    margin-top: 0.5em;
-    letter-spacing: 1px;
-}
+#browser-game-trigger .case-study-title { color: #3e2723; font-size: 3.5vw; line-height: 1.1; margin: 0; }
+#browser-game-trigger .case-study-subtitle { color: #d81b60; font-family: 'Courier New', monospace; font-weight: bold; font-size: 1.4vw; margin-top: 0.5em; letter-spacing: 1px; }
 
-/* The Caret (Dark Chocolate) */
 #browser-game-trigger .case-study-caret {
     position: absolute;
     right: 4vw;
     top: 50%;
     margin: 0;
-    border-color: #3e2723; /* Dark brown caret */
+    border-color: #3e2723;
     transform: translateY(-50%) rotate(45deg);
 }
 #browser-game-trigger[aria-expanded="true"] .case-study-caret {
     transform: translateY(-50%) rotate(-135deg);
 }
 
-/* --- Game Container & Overlay --- */
-
+/* Game Canvas & Overlay */
 #game-stage-container {
-    position: relative; /* Anchor for absolute overlays */
+    position: relative;
     width: 100%;
     max-width: 800px;
     margin: 0 auto 2em auto;
-    background: #000; /* Letterbox color */
+    background: #000;
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 10px 20px rgba(0,0,0,0.1);
 }
 
-canvas#gameCanvas {
-    display: block;
-    width: 100%;
-    height: auto;
-}
+canvas#gameCanvas { display: block; width: 100%; height: auto; }
 
-/* The Click-to-Play Overlay */
 #game-overlay {
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(255, 245, 245, 0.85); /* Semi-transparent Soft Pop */
+    background: rgba(255, 245, 245, 0.85);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 10;
     transition: opacity 0.3s ease;
 }
-
-#game-overlay.hidden {
-    opacity: 0;
-    pointer-events: none; /* Let clicks pass through to canvas */
-}
-
-#game-overlay h4 {
-    color: #3e2723;
-    margin-bottom: 1em;
-}
+#game-overlay.hidden { opacity: 0; pointer-events: none; }
+#game-overlay h4 { color: #3e2723; margin-bottom: 1em; }
 
 #start-engine-btn {
-    background: #d81b60; /* Magenta */
+    background: #d81b60;
     color: white;
     border: none;
     padding: 0.8em 2em;
     font-size: 1.2rem;
     border-radius: 30px;
-    cursor: pointer;
     font-weight: bold;
     box-shadow: 0 4px 10px rgba(216, 27, 96, 0.3);
     transition: transform 0.2s;
 }
+#start-engine-btn:hover { transform: scale(1.05); background: #ad1457; }
 
-#start-engine-btn:hover {
-    transform: scale(1.05);
-    background: #ad1457;
-}
-
-/* --- Mobile Controls (Hidden by default) --- */
+/* Mobile Game Controls */
 #mobile-controls {
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
-    pointer-events: none; /* Let touches pass through empty spaces */
+    pointer-events: none;
     z-index: 20;
 }
-
-#mobile-controls.hidden {
-    display: none;
-}
+#mobile-controls.hidden { display: none; }
 
 .touch-btn {
     position: absolute;
-    pointer-events: auto; /* Catch touches on buttons */
+    pointer-events: auto;
     background: rgba(255, 255, 255, 0.3);
     border: 2px solid rgba(255, 255, 255, 0.6);
     color: white;
@@ -701,583 +464,89 @@ canvas#gameCanvas {
     align-items: center;
     user-select: none;
 }
-
-.touch-btn:active {
-    background: rgba(255, 255, 255, 0.6);
-}
-
-/* Positioning */
 #btn-left { bottom: 30px; left: 20px; }
 #btn-right { bottom: 30px; left: 100px; }
-#btn-jump { bottom: 30px; right: 30px; background: rgba(216, 27, 96, 0.4); border-color: #d81b60;}
+#btn-jump { bottom: 30px; right: 30px; background: rgba(216, 27, 96, 0.4); border-color: #d81b60; }
 
-/* Fullscreen Toggle Button */
 #btn-fullscreen-enter {
     position: absolute;
-    top: 10px;
-    right: 10px;
+    top: 10px; right: 10px;
     background: rgba(0,0,0,0.5);
     color: white;
     border: none;
     padding: 5px 10px;
     border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.8rem;
     z-index: 15;
 }
-
-/* Hide Fullscreen button on desktop if you want, or keep it */
 @media (min-width: 768px) {
     #btn-fullscreen-enter { display: none; }
 }
 
-/*
-=====================================================
-Alternating Content Layout
-=====================================================
-*/
-
-.case-study-feature {
-    display: flex;
-    align-items: center; /* Vertically center text and image */
-    gap: 2em;
-    margin-bottom: 3em;
-    flex-wrap: wrap;
-    padding: 1.5em 2em;
-}
-
-/* This is the magic! It targets every 'even' row (2, 4, etc.) */
-/* and reverses the order of the flex items. */
-.case-study-feature:nth-child(even) {
-    flex-direction: row-reverse;
-}
-
-.case-study-feature .case-study-image {
-    flex: 1; /* Each takes 50% width */
-    min-width: 300px;
-}
-
-.case-study-feature .case-study-text {
-    flex: 1; /* Each takes 50% width */
-    min-width: 300px;
-}
-
-.case-study-feature img {
+/* =========================================
+   8. FOOTER
+   ========================================= */
+footer {
+    padding: 5vw 0;
     width: 100%;
-    height: auto;
-    border-radius: 4px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-}
-
-/* --- Make it stack on mobile --- */
-@media (max-width: 767px) {
-    .case-study-feature,
-    .case-study-feature:nth-child(even) {
-        flex-direction: column; /* Stack everything vertically */
-    }
-}
-
-/*Aside Styles*/
-
-
-aside {
-    background: gray;
-    margin: auto;
-    width: 15%;
-}
-
-.left {
-    float: left;
-}
-
-.left img {
-    width: 15vw;
-    height: auto;
-}
-
-.right {
-    float: right;
-}
-
-/*Article Styles*/
-
-article {
-    font-family: var(--font-body);
-    font-size: var(--text-lg);
-    margin: 1em auto;
-    width: 60%;
-}
-
-/*Video Styles*/
-
-.video {
     text-align: center;
+    background: url('../images/mark-basarab-1OtUkD_8svc-unsplash.jpg') no-repeat center center;
+    background-size: cover;
 }
 
-/*Button Styles*/
-
-.join_button_section {
-    width: auto;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 20px;
+.footer_content {
+    display: inline-block;
+    padding: 2em;
+    background: rgba(255, 255, 255, 0.8);
 }
 
-.join_button_section h2 {
-    font-size: var(--text-h3);
-}
-
-.join_button {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 30vw;
-    height: 6vw;
-    color: var(--color-text-light);
-    text-decoration: none;
-    border-radius: .5vw;
-    background: linear-gradient(150deg, black, #555);
-    transition: background 0.3s, text-decoration 0.3s;
-}
-
-
-.join_button:hover {
-    background: linear-gradient(150deg, black, #555);
-    text-decoration: underline;
-    animation: pulse 1.5s ease-in-out infinite;
-}
-
-@keyframes pulse {
-    0% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.1);
-    }
-    100% {
-        transform: scale(1);
-    }
-}
-
-
-
-.join_button:visited,
-.join_button:active,
-.join_button:link {
-    color: var(--color-text-light);
-    text-decoration: none;
-}
+#creditsList { list-style: none; padding: 0; margin-top: 1em; }
+#creditsList.hidden { display: none; }
 
 #toggleCredits {
     background-color: var(--color-dark-gray);
     color: var(--color-text-light);
     border: none;
     padding: 0.5em 1em;
-    cursor: pointer;
     border-radius: 5px;
+    margin-top: 1em;
 }
 
-#toggleCredits:hover {
-    background-color: var(--color-dark-gray-hover);
-}
+/* =========================================
+   9. MEDIA QUERIES
+   ========================================= */
 
-.case-study-feature .case-study-image,
-    .case-study-feature .case-study-text {
-        min-width: 0; 
-        /* or 'min-width: unset;' also works */
-    }
-
-/*Contact Form Styles*/
-
-.contact {
-    background-color: #fff;
-    padding: 2em;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 400px;
-}
-
-form {
-    display: flex;
-    flex-direction: column;
-}
-
-label {
-    margin-bottom: 0.5em;
-    font-weight: bold;
-}
-
-input[type="text"],
-input[type="email"],
-textarea {
-    padding: 0.5em;
-    margin-bottom: 1em;
-    border: 1px solid var(--color-border-medium);
-    border-radius: 4px;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-textarea {
-    resize: vertical;
-}
-
-button {
-    padding: 0.7em;
-    border: none;
-    border-radius: 4px;
-    background-color: var(--color-primary-blue);
-    color: var(--color-text-light);
-    font-size: var(--text-base);
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-button:hover {
-    background-color: var(--color-primary-blue-dark);
-}
-
-fieldset {
-    border-radius: 4px;
-    border: 1px solid var(--color-border-medium);
-}
-
-/*Table Styles*/
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 20px 0;
-}
-th, td {
-    border: 1px solid var(--color-border-light);
-    padding: 8px;
-    text-align: left;
-}
-th {
-    background-color: var(--color-background-medium);
-}
-
-/*Footer Styles*/
-
-footer {
-    padding: 5vw 0 5vw 0;
-    margin: 0; /* Changed from margin:; */
-    width: 100%;
-    text-align: center;
-    font-family: var(--font-body);
-    font-size: var(--text-sm); /* Using variable */
-    background-size: cover;
-    background: url(../images/mark-basarab-1OtUkD_8svc-unsplash.jpg) no-repeat center center;
-}
-
-.footer_content {
-    width: auto;
-    padding: 2vw;
-    background: rgba(255, 255, 255, 0.7);
-}
-
-footer a:link {
-    color: var(--color-text-primary);
-    text-decoration: none;
-}
-
-footer a:hover {
-    color: var(--color-text-primary);
-    text-decoration: underline;
-}
-
-footer a:visited {
-    color: var(--color-text-primary);
-    text-decoration: none;
-}
-
-footer a:active {
-    color: var(--color-text-primary);
-    text-decoration: none;
-}
-
-/* Credits list styles */
-#creditsList {
-    list-style-type: none;
-    padding: 0;
-    margin: 1em 0 0;
-}
-
-#creditsList.hidden {
-    display: none;
-}
-
-/* Medium screens (tablets) */
+/* --- Tablet (768px - 991px) --- */
 @media (min-width: 768px) and (max-width: 991px) {
-    .mcgovern_design_header {
-        width: 100%;
-        height: 30vw;
-    }
-
-    .services_header {
-        width: 100%;
-        height: 30vw;
-    }
+    .mcgovern_design_header, .header_text { height: auto; }
     
-    .about_header {
-        width: 100%;
-        height: 30vw;
-    }
+    header h1 { font-size: 5vw; }
+    header h2 { font-size: 3vw; margin: .5vw; }
 
-    .contact_header {
-        width: 100%;
-        height: 30vw;
-    }
-
-    .privacy_header {
-        width: 100%;
-        height: 30vw;
-    }
-
-    .terms_header {
-        width: 100%;
-        height: 30vw;
-    }
-
-    nav ul {
-        align-items: center;
-        padding: 1em;
-    }
-
-    nav ul li {
-        font-size: 3vw;
-        margin-right: 1em;
-        margin-bottom: 0;
-    }
-
-    header h1 {
-        font-size: 5vw;
-        padding: 1vw;
-        margin: .5vw;
-    }
-
-    header h2 {
-        font-size: 3vw;
-        padding:;
-        margin: .5vw;
-    }
-
-    aside {
-        width: 45%;
-        float: none;
-        margin: 1em auto;
-    }
-    .right {
-        float: none;
-    }
-
-    .left {
-        float: none;
-    }
-
-    article {
-        width: 90%;
-        margin: 1em auto;
-    }
-
-    footer {
-        width: 90%;
-        margin: 1em auto;
-    }
+    aside { width: 45%; float: none; margin: 1em auto; }
+    article, footer { width: 90%; margin: 1em auto; }
 }
 
-/* Small screens (phones) */
+/* --- Mobile (Max 767px) --- */
 @media (max-width: 767px) {
+    
+    /* Layout Stacking */
+    .about_section { flex-direction: column; max-width: 90vw; text-align: center; }
+    .about_photo img { width: 40vw; height: 40vw; }
+    .about_text { margin-top: 2em; }
+    
+    /* Header Adjustments */
+    header h1 { font-size: var(--text-h1-mobile); }
+    header h2 { font-size: var(--text-h2-mobile); }
+    .social_nav img { width: 10vw; }
 
-    #bat-city-bites-trigger {
-        background-size: 150% auto;
+    /* Case Study Mobile Stacking */
+    .case-study-feature, .case-study-feature:nth-child(even) {
+        flex-direction: column;
     }
 
-    #bat-city-bites-trigger .case-study-title {
-        font-size:7vw;
-    }
-
-    #bat-city-bites-trigger .case-study-logo {
-        width: 14vw;
-    } 
-
-    #bat-city-bites-trigger .case-study-subtitle {
-        font-size: 3vw;
-    }
-
-    img.logo{
-        width:15vw;
-        height: auto;
-    }
-
-    .mcgovern_design_header {
-        display: flex;
-        width: 100%;
-        height: 30vw;
-    }
-
-    .header_text{
-        margin:-4vw 0 -1vw 0;
-    }
-
-    nav ul {
-        display: flex;
-        justify-content: center;
-        padding: 0;
-        margin: 0;
-    }
-
-    nav ul li {
-        margin-right: 1em;
-        margin-bottom: 0;
-    }
-
-    nav ul li a:link {
-        font-size: 3vw;
-        color: var(--color-text-primary);
-        text-decoration: none;
-    }
-
-    nav ul li a:hover {
-        color: var(--color-text-primary);
-        text-decoration: underline;
-    }
-
-    nav ul li a:visited {
-        color: var(--color-text-primary);
-        text-decoration: none;
-    }
-
-    nav ul li a:active {
-        color: var(--color-text-primary);
-        text-decoration: none;
-    }
-
-    .mcgovern_design_header h1 {
-        font-size: 6vw;
-        padding: 1vw;
-        margin: 0vw;
-        align-items: center;
-    }
-
-    section {
-        width: 100%;
-    }
-
-    aside {
-        width: 100%;
-        float: none;
-        margin: 1em auto;
-    }
-
-    .right {
-        float: none;
-    }
-
-    .left {
-        float: none;
-    }
-
-    article {
-        font-size: 2em;
-        width: 100%;
-        margin: 1em auto;
-    }
-
-    footer {
-        width: 100%;
-        margin: 1em auto;
-    }
-
-    /* ADD THESE STYLES INSIDE YOUR @media (max-width: 767px) { ... } BLOCK */
-
-    /* --- Header Fix --- */
-    /* Make header text smaller and more readable on mobile */
-    header h1 {
-        font-size: var(--text-h1-mobile); /* Use h2 size for h1 on mobile */
-    }
-
-    header h2 {
-        font-size: var(--text-h2-mobile); /* Use h3 size for h2 on mobile */
-        padding: 0vw 1vw 1vw 1vw; /* Add more padding at the bottom */
-    }
-
-
-    /* --- About Section Fix --- */
-    /* This makes the "About" section stack vertically */
-    .about_section {
-        flex-direction: column; /* Stack photo on top of text */
-        max-width: 90vw;        /* Let it use most of the screen */
-        margin: 5vh auto;       /* Give it vertical space */
-    }
-
-    .about_photo {
-        margin: 5vh 0 0 0; /* Adjust margin for stacking */
-    }
-
-    .about_photo img {
-        width: 40vw;  /* Make photo much larger on mobile (e.g., 40% of screen) */
-        height: 40vw; /* Keep it a circle */
-    }
-
-    .about_text {
-        max-width: 90vw;     /* Let text use the full width */
-        margin: 3vh 0 0 0;   /* New margin for stacked layout */
-        text-align: center;  /* Center-align bio text on mobile */
-    }
-
-    .bio {
-        font-size: var(--text-base); /* Use 1rem for main body text */
-    }
-
-    .social_nav {
-        margin-top: 2em; /* Give icons more space */
-    }
-
-    .social_nav img {
-        width: 10vw; /* Make social icons larger and easier to tap */
-    }
-
-
-    /* --- Work Section Fix --- */
-    /* This makes your portfolio pieces larger on mobile */
-    .work_example_section {
-        width: 90%; /* Use more of the screen width */
-    }
-
-    .work_example {
-        max-width: 80vw; /* Let project examples be much wider */
-    }
-
-    .work_example img {
-        width: 70vw; /* Make project images large */
-        height: auto;
-    }
-
-    .work_example h3 {
-        font-size: var(--text-lg); /* 1.125rem */
-    }
-
-    .work_example p {
-        font-size: var(--text-base); /* 1rem */
-    }
-
-    /* --- Article/Aside Fix (if you use them) --- */
-    /* This makes the old 'aside' and 'article' full-width */
-    aside {
-        width: 90%;
-        float: none;
-    }
-
-    article {
-        width: 90%;
-        font-size: var(--text-lg);
-    }
+    /* Bat City Bites Mobile */
+    #bat-city-bites-trigger { background-size: 250% auto; }
+    #bat-city-bites-trigger .case-study-title { font-size: 7vw; }
+    #bat-city-bites-trigger .case-study-subtitle { font-size: 3vw; }
+    #bat-city-bites-trigger .case-study-logo { width: 14vw; }
 }
-
-/* REMOVED the extra '}' curly brace that was here. 
-    Your @media (max-width: 767px) block is now correctly closed.
-*/
