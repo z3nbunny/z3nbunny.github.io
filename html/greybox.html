@@ -21,28 +21,67 @@
             border: 4px solid #1e293b; 
             border-radius: 4px; 
             box-shadow: 0 0 40px rgba(0,0,0,0.8);
-            width: 720px;
-            height: 480px;
-            max-width: 100vw; /* Responsive fix */
-            max-height: 100vh; /* Responsive fix */
+            
+            /* --- RESPONSIVE FIX --- */
+            width: 100%;             /* Fill the available width */
+            max-width: 720px;        /* ...but don't get bigger than 3x scale */
+            height: auto;            /* Auto-calculate height based on width */
+            aspect-ratio: 3 / 2;     /* Enforce the GBA 3:2 ratio (Important!) */
+            
+            /* Center it */
+            display: block;
+            margin: 0 auto;
         }
         
-        /* Mobile Control Styles */
+        /* --- NEW MOBILE CONTROLS CSS --- */
+        .control-zone {
+            position: absolute;
+            bottom: 20px;
+            width: 140px;
+            height: 140px;
+            /* border: 1px dashed rgba(255,255,255,0.1); Debugging circle */
+        }
+        #zone-left { left: 20px; }
+        #zone-right { right: 20px; }
+
         .touch-btn {
             position: absolute;
-            width: 60px; height: 60px;
-            background: rgba(255, 255, 255, 0.15);
-            border: 2px solid rgba(255, 255, 255, 0.3);
+            width: 45px; height: 45px;
+            background: rgba(255, 255, 255, 0.15); /* Transparent White */
+            border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 50%;
             display: flex; justify-content: center; align-items: center;
-            color: rgba(255,255,255,0.7); font-weight: bold; font-size: 14px;
-            pointer-events: auto;
+            color: rgba(255,255,255,0.6); 
+            font-weight: 900; font-size: 16px;
             backdrop-filter: blur(2px);
-            transition: background 0.1s;
+            transition: background 0.1s, transform 0.1s;
+            user-select: none;
         }
-        .touch-btn:active, .touch-btn.pressed { background: rgba(255, 255, 255, 0.4); border-color: white; }
-        
-        /* Hide controls on desktop */
+
+        /* Opaque on Touch */
+        .touch-btn:active, .touch-btn.pressed { 
+            background: rgba(255, 255, 255, 0.5); 
+            color: #fff;
+            transform: scale(0.95);
+        }
+
+        /* D-PAD POSITIONS (Cross Layout) */
+        #dpad-up    { top: 0; left: 50%; transform: translateX(-50%); }
+        #dpad-down  { bottom: 0; left: 50%; transform: translateX(-50%); }
+        #dpad-left  { top: 50%; left: 0; transform: translateY(-50%); }
+        #dpad-right { top: 50%; right: 0; transform: translateY(-50%); }
+
+        /* ACTION BUTTONS (Diamond Layout) */
+        /* Up: Consume */
+        #btn-consume { top: 0; left: 50%; transform: translateX(-50%); border-color: #fbbf24; color: #fbbf24; }
+        /* Down: Attack */
+        #btn-attack  { bottom: 0; left: 50%; transform: translateX(-50%); border-color: #818cf8; color: #818cf8; }
+        /* Left: Block */
+        #btn-block   { top: 50%; left: 0; transform: translateY(-50%); border-color: #38bdf8; color: #38bdf8; }
+        /* Right: Jump */
+        #btn-jump    { top: 50%; right: 0; transform: translateY(-50%); border-color: #fb7185; color: #fb7185; }
+
+        /* Hide on Desktop */
         @media (min-width: 768px) {
             #mobile-controls { display: none; }
         }
@@ -68,11 +107,17 @@
     </div>
 
     <div id="mobile-controls" class="fixed inset-0 pointer-events-none z-40">
-        <div id="dpad-left" class="touch-btn" style="bottom: 40px; left: 20px; border-radius: 10px 0 0 10px; width: 50px;">L</div>
-        <div id="dpad-right" class="touch-btn" style="bottom: 40px; left: 80px; border-radius: 0 10px 10px 0; width: 50px;">R</div>
         
-        <div id="btn-z" class="touch-btn" style="bottom: 50px; right: 20px; border-color: #fb7185; color:#fb7185;">JUMP</div>
-        <div id="btn-x" class="touch-btn" style="bottom: 30px; right: 90px; border-color: #818cf8; color:#818cf8;">ATK</div>
+        <div id="zone-left" class="control-zone pointer-events-auto">
+            <div id="dpad-up" class="touch-btn">▲</div>
+            <div id="dpad-down" class="touch-btn">▼</div>
+            <div id="dpad-left" class="touch-btn">◀</div>
+            <div id="dpad-right" class="touch-btn">▶</div>
+        </div>
+
+        <div id="zone-right" class="control-zone pointer-events-auto">
+            <div id="btn-consume" class="touch-btn">V</div> <div id="btn-block" class="touch-btn">C</div>   <div id="btn-jump" class="touch-btn">Z</div>    <div id="btn-attack" class="touch-btn">X</div>  </div>
+
     </div>
 
     <div class="mt-6 flex gap-6 text-[10px] font-bold text-slate-500 uppercase tracking-widest text-center hidden md:flex">
@@ -512,24 +557,49 @@
             if(k==='x') input.attack=false; if(k==='c') input.keyBlock = false; 
         });
 
-        // TOUCH CONTROLS
+        // --- UPDATED TOUCH CONTROLS ---
         const addTouch = (id, startFn, endFn) => {
             const el = document.getElementById(id);
             if(el) {
+                // PreventDefault on touchstart stops the browser from zooming/scrolling
                 el.addEventListener('touchstart', (e) => { e.preventDefault(); el.classList.add('pressed'); startFn(); });
-                el.addEventListener('touchend', (e) => { e.preventDefault(); el.classList.remove('pressed'); endFn(); });
+                // Handle touchend/touchcancel/touchleave
+                const stop = (e) => { e.preventDefault(); el.classList.remove('pressed'); if(endFn) endFn(); };
+                el.addEventListener('touchend', stop);
+                el.addEventListener('touchcancel', stop);
+                el.addEventListener('mouseleave', stop); // Mouse fallback
             }
         };
 
-        addTouch('dpad-left', () => input.left = true, () => input.left = false);
+        // D-Pad
+        addTouch('dpad-up',    () => input.up = true,    () => input.up = false);
+        addTouch('dpad-down',  () => input.down = true,  () => input.down = false);
+        addTouch('dpad-left',  () => input.left = true,  () => input.left = false);
         addTouch('dpad-right', () => input.right = true, () => input.right = false);
-        addTouch('btn-z', () => { if(!input.jump) input.jumpPressed=true; input.jump=true; }, () => { input.jump=false; input.jumpReleased=true; });
-        addTouch('btn-x', () => { input.attack=true; input.attackPressed=true; }, () => { input.attack=false; });
 
-        function resetPlayer() { player.x = 100; player.y = 926; player.velX = 0; player.velY = 0; player.hp=100; camY = 800; showNotif("Reset"); }
-        function showNotif(m) { const n=document.getElementById('notification'); n.innerText=m; n.style.opacity=1; setTimeout(()=>n.style.opacity=0, 1500); }
+        // Actions (Diamond Layout)
+        // Right: Jump (Z)
+        addTouch('btn-jump', () => { 
+            if(!input.jump) input.jumpPressed = true; 
+            input.jump = true; 
+        }, () => { 
+            input.jump = false; 
+            input.jumpReleased = true; 
+        });
 
-        requestAnimationFrame(gameLoop);
+        // Down: Attack (X)
+        addTouch('btn-attack', () => { 
+            input.attack = true; 
+            input.attackPressed = true; 
+        }, () => { 
+            input.attack = false; 
+        });
+
+        // Left: Block (C)
+        addTouch('btn-block',  () => input.keyBlock = true, () => input.keyBlock = false);
+
+        // Up: Consume (V)
+        addTouch('btn-consume', () => input.consumePressed = true, () => {});
     </script>
 </body>
 </html>
