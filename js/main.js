@@ -1,23 +1,17 @@
-/*
-    McGovern.Design - Main Logic
-    Handles the Case Study Accordions and the Game Engine Loader
-*/
-
 document.addEventListener('DOMContentLoaded', () => {
     
+    console.log("Main.js loaded successfully.");
+
     // --- 1. ACCORDION LOGIC ---
     const triggers = document.querySelectorAll('.case-study-trigger');
-
     triggers.forEach(trigger => {
         trigger.addEventListener('click', () => {
             const isExpanded = trigger.getAttribute('aria-expanded') === 'true';
-            const content = trigger.nextElementSibling;
             
-            // Close all other accordions (Optional - "Exclusive Accordion")
+            // Close all others
             triggers.forEach(otherTrigger => {
                 if (otherTrigger !== trigger) {
                     otherTrigger.setAttribute('aria-expanded', 'false');
-                    // Reset the caret rotation via CSS class or attribute
                 }
             });
 
@@ -26,37 +20,57 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- 2. GAME ENGINE LOADER ---
+    // --- 2. GAME ENGINE LOADER & FULLSCREEN ---
     const startBtn = document.getElementById('start-engine-btn');
     const gameContainer = document.getElementById('game-stage-container');
-    const gameOverlay = document.getElementById('game-overlay');
+    const fsBtn = document.getElementById('btn-fullscreen-enter');
 
-    if (startBtn && gameContainer) {
+    // Fullscreen Logic
+    if (fsBtn && gameContainer) {
+        fsBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                gameContainer.requestFullscreen().catch(err => {
+                    console.error(`Error enabling full-screen mode: ${err.message}`);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        });
+    }
+
+    // Game Loader Logic
+    if (startBtn) {
         startBtn.addEventListener('click', () => {
-            
-            // Visual Feedback
+            console.log("Initializing Game Engine...");
             startBtn.innerText = "LOADING...";
             startBtn.style.opacity = "0.7";
 
-            // 1. Create the Iframe
             const iframe = document.createElement('iframe');
             iframe.src = 'html/greybox.html';
             iframe.style.width = '100%';
-            iframe.style.height = '600px'; // Tall enough for game + dev tools
+            iframe.style.height = '480px'; // 3x scale of 160px
             iframe.style.border = 'none';
             iframe.style.display = 'block';
-            
-            // 2. Clear the container (removes the placeholder image if any)
-            // But we want to keep the overlay until it loads, so we append.
-            
-            // Actually, let's swap the inner HTML to just the iframe
-            // This effectively removes the overlay and button
-            
-            // Wait a tiny bit for the "Loading" text to register, then swap
+            iframe.allow = "fullscreen"; // Allow iframe to inherit fullscreen
+
             setTimeout(() => {
-                gameContainer.innerHTML = ''; // Clear Overlay & Button
-                gameContainer.appendChild(iframe);
-                gameContainer.style.background = '#020617'; // Match game background
+                // SURGICAL REMOVAL: Only remove the placeholder items, NOT the container or button
+                const overlay = document.getElementById('game-overlay');
+                const placeholderCanvas = gameContainer.querySelector('canvas');
+                const oldMobileControls = document.getElementById('mobile-controls'); // Remove index.html's controls
+                
+                if (overlay) overlay.remove();
+                if (placeholderCanvas) placeholderCanvas.remove();
+                if (oldMobileControls) oldMobileControls.remove();
+
+                // Insert iframe BEFORE the fullscreen button so the button stays at the bottom
+                if (fsBtn) {
+                    gameContainer.insertBefore(iframe, fsBtn);
+                } else {
+                    gameContainer.appendChild(iframe);
+                }
+                
+                gameContainer.style.background = '#020617'; 
             }, 500);
         });
     }
