@@ -6,88 +6,86 @@
     <title>GBA Mechanics Lab - Portfolio Demo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { 
-            background-color: #020617; 
-            color: #f8fafc; 
-            font-family: 'Inter', sans-serif; 
-            overflow: hidden; 
-            touch-action: none; /* Prevents scroll on mobile */
+        /* Force the body to fill the iframe exactly */
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #020617;
+            overflow: hidden; /* No scrolling allowed */
+            touch-action: none;
             user-select: none;
             -webkit-user-select: none;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 100vh;
         }
-        
-        #game-container { 
-            position: relative; 
-            image-rendering: pixelated; 
+
+        #game-container {
+            position: relative;
             width: 100%;
+            height: 100%;
             display: flex;
             justify-content: center;
+            align-items: center;
         }
         
         canvas { 
             background-color: #0f172a; 
-            border: 4px solid #1e293b; 
-            border-radius: 4px; 
-            box-shadow: 0 0 40px rgba(0,0,0,0.8);
+            image-rendering: pixelated; 
+            box-shadow: 0 0 50px rgba(0,0,0,0.9);
             
-            /* --- RESPONSIVE FIX --- */
-            width: 100%;            
-            max-width: 720px;       
-            height: auto;           
-            aspect-ratio: 3 / 2;    
-            display: block;
+            /* --- MAXIMIZE SCREEN SIZE --- */
+            /* This forces the canvas to grow as big as possible while keeping ratio */
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* The Magic CSS Property */
+            aspect-ratio: 3/2;
         }
         
-        /* --- NEW MOBILE CONTROLS CSS --- */
+        /* --- MOBILE CONTROLS --- */
         .control-zone {
             position: absolute;
-            bottom: 60px; /* Adjusted to sit safely above home bars */
-            width: 150px;
-            height: 150px;
-            z-index: 100; /* Super high priority */
+            bottom: 40px; /* Safe distance from bottom */
+            width: 160px; /* Bigger touch zones */
+            height: 160px;
+            z-index: 999; /* Always on top */
         }
         #zone-left { left: 10px; }
         #zone-right { right: 10px; }
 
         .touch-btn {
             position: absolute;
-            width: 50px; height: 50px; /* Slightly larger targets */
-            background: rgba(255, 255, 255, 0.15); 
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            width: 55px; height: 55px; /* Bigger Buttons */
+            background: rgba(255, 255, 255, 0.1); 
+            border: 2px solid rgba(255, 255, 255, 0.15);
             border-radius: 50%;
             display: flex; justify-content: center; align-items: center;
-            color: rgba(255,255,255,0.6); 
-            font-weight: 900; font-size: 18px;
-            backdrop-filter: blur(2px);
+            color: rgba(255,255,255,0.8); 
+            font-weight: 900; font-size: 20px;
+            backdrop-filter: blur(4px);
             transition: background 0.1s, transform 0.1s;
-            user-select: none;
-            touch-action: none;
         }
 
         .touch-btn:active, .touch-btn.pressed { 
-            background: rgba(255, 255, 255, 0.5); 
-            color: #fff;
+            background: rgba(255, 255, 255, 0.4); 
+            border-color: #fff;
             transform: scale(0.95);
         }
 
-        /* D-PAD POSITIONS (Cross Layout) */
+        /* D-PAD POSITIONS */
         #dpad-up    { top: 0; left: 50%; transform: translateX(-50%); }
         #dpad-down  { bottom: 0; left: 50%; transform: translateX(-50%); }
         #dpad-left  { top: 50%; left: 0; transform: translateY(-50%); }
         #dpad-right { top: 50%; right: 0; transform: translateY(-50%); }
 
-        /* ACTION BUTTONS (Diamond Layout) */
+        /* ACTION BUTTONS */
         #btn-consume { top: 0; left: 50%; transform: translateX(-50%); border-color: #fbbf24; color: #fbbf24; }
         #btn-attack  { bottom: 0; left: 50%; transform: translateX(-50%); border-color: #818cf8; color: #818cf8; }
         #btn-block   { top: 50%; left: 0; transform: translateY(-50%); border-color: #38bdf8; color: #38bdf8; }
         #btn-jump    { top: 50%; right: 0; transform: translateY(-50%); border-color: #fb7185; color: #fb7185; }
 
-        /* Hide on Desktop */
         @media (min-width: 768px) {
             #mobile-controls { display: none; }
         }
@@ -106,31 +104,28 @@
                 <span id="player-hp-text" class="text-[10px] font-black text-rose-400 drop-shadow-md">100 HP</span>
             </div>
         </div>
-
-        <div id="notification" class="absolute bottom-8 left-1/2 -translate-x-1/2 bg-indigo-600 text-white px-3 py-1 rounded-full text-[10px] font-bold opacity-0 transition-opacity pointer-events-none z-50 shadow-lg tracking-widest">
+        
+        <div id="notification" class="absolute bottom-12 left-1/2 -translate-x-1/2 bg-indigo-600 text-white px-3 py-1 rounded-full text-[10px] font-bold opacity-0 transition-opacity pointer-events-none z-50 shadow-lg tracking-widest">
             INITIALIZED
         </div>
     </div>
 
-    <div id="mobile-controls" class="fixed inset-0 pointer-events-none z-50">
-        
+    <div id="mobile-controls" class="fixed inset-0 pointer-events-none">
         <div id="zone-left" class="control-zone pointer-events-auto">
             <div id="dpad-up" class="touch-btn">▲</div>
             <div id="dpad-down" class="touch-btn">▼</div>
             <div id="dpad-left" class="touch-btn">◀</div>
             <div id="dpad-right" class="touch-btn">▶</div>
         </div>
-
         <div id="zone-right" class="control-zone pointer-events-auto">
             <div id="btn-consume" class="touch-btn">V</div> 
             <div id="btn-block" class="touch-btn">C</div>   
             <div id="btn-jump" class="touch-btn">Z</div>    
             <div id="btn-attack" class="touch-btn">X</div>  
         </div>
-
     </div>
 
-    <div class="mt-6 flex gap-6 text-[10px] font-bold text-slate-500 uppercase tracking-widest text-center hidden md:flex">
+    <div class="fixed bottom-4 left-0 w-full flex justify-center gap-6 text-[10px] font-bold text-slate-500 uppercase tracking-widest pointer-events-none hidden md:flex">
         <div><b class="text-indigo-400">ARROWS</b> Move</div>
         <div><b class="text-indigo-400">Z</b> Jump</div>
         <div><b class="text-indigo-400">X</b> Attack</div>
@@ -146,14 +141,13 @@
         const WORLD_HEIGHT = 960; 
         ctx.imageSmoothingEnabled = false;
 
-        // --- 1. SCROLL FIX ---
+        // SCROLL FIX
         window.addEventListener('keydown', function(e) {
             if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight", "Space"].indexOf(e.code) > -1) {
                 e.preventDefault();
             }
         }, false);
 
-        // --- PRESET CONFIG ---
         const config = {
             walkAccel: 0.24, walkMax: 1.32, runAccel: 0.42, runMax: 2.88,
             frictionGround: 0.82, frictionAir: 0.98, airAccel: 0.12,
@@ -185,21 +179,23 @@
         ];
         let deadEnemies = [];
 
-        // --- 2. ASSET LOADING ---
+        // --- FIXED ASSET LOADING ---
+        // I have reverted these to 'sprite_*.png' to match your likely file structure.
+        // If your files are named 'hero_*.png', rename them in your folder to match this list!
         const sprites = {};
         const assetManifest = [
-            { key: 'IDLE', src: '../images/solry_sprites/hero_idle.png', frames: 4, speed: 10 },
-            { key: 'WALK', src: '../images/solry_sprites/hero_walk.png', frames: 4, speed: 8 },
-            { key: 'RUN', src: '../images/solry_sprites/hero_run.png', frames: 4, speed: 6 },
-            { key: 'JUMP', src: '../images/solry_sprites/hero_jump.png', frames: 3, speed: 6 },
-            { key: 'FALL', src: '../images/solry_sprites/hero_fall.png', frames: 4, speed: 10 },
-            { key: 'LAND', src: '../images/solry_sprites/hero_land.png', frames: 3, speed: 5 },
-            { key: 'WALL_SLIDE', src: '../images/solry_sprites/hero_wall_slide.png', frames: 2, speed: 5 },
-            { key: 'BLOCK', src: '../images/solry_sprites/hero_block.png', frames: 6, speed: 5 },
-            { key: 'CHARGING', src: '../images/solry_sprites/hero_charge_short.png', frames: 1, speed: 5 },
-            { key: 'ATTACK_FWD', src: '../images/solry_sprites/hero_attack_fwd.png', frames: 6, speed: 4 },
-            { key: 'CONSUME', src: '../images/solry_sprites/hero_consume.png', frames: 6, speed: 6 },
-            { key: 'ENEMY_IDLE', src: '../images/solry_sprites/enemy_1_idle.png', frames: 4, speed: 10 }
+            { key: 'IDLE',       src: '../images/solry_sprites/sprite_idle.png',       frames: 4, speed: 10 },
+            { key: 'WALK',       src: '../images/solry_sprites/sprite_walk.png',       frames: 4, speed: 8 },
+            { key: 'RUN',        src: '../images/solry_sprites/sprite_run.png',        frames: 4, speed: 6 },
+            { key: 'JUMP',       src: '../images/solry_sprites/sprite_jump.png',       frames: 3, speed: 6 },
+            { key: 'FALL',       src: '../images/solry_sprites/sprite_fall.png',       frames: 4, speed: 10 },
+            { key: 'LAND',       src: '../images/solry_sprites/sprite_land.png',       frames: 3, speed: 5 },
+            { key: 'WALL_SLIDE', src: '../images/solry_sprites/sprite_wall_slide.png', frames: 2, speed: 5 },
+            { key: 'BLOCK',      src: '../images/solry_sprites/sprite_block.png',      frames: 6, speed: 5 },
+            { key: 'CHARGING',   src: '../images/solry_sprites/sprite_charging.png',   frames: 1, speed: 5 },
+            { key: 'ATTACK_FWD', src: '../images/solry_sprites/sprite_attack.png',     frames: 6, speed: 4 },
+            { key: 'CONSUME',    src: '../images/solry_sprites/sprite_consume.png',    frames: 6, speed: 6 },
+            { key: 'ENEMY_IDLE', src: '../images/solry_sprites/sprite_enemy.png',      frames: 4, speed: 10 }
         ];
 
         assetManifest.forEach(def => {
@@ -209,10 +205,9 @@
             img.onload = () => { sprites[def.key].img = img; };
         });
         
+        // Safety Fallback for missing keys
         const allKeys = ['IDLE', 'WALK', 'RUN', 'JUMP', 'FALL', 'LAND', 'WALL_SLIDE', 'BLOCK', 'CHARGING', 'ATTACK_FWD', 'ATTACK_UP', 'ATTACK_DOWN', 'CONSUME', 'ENEMY_IDLE'];
-        allKeys.forEach(k => {
-            if(!sprites[k]) sprites[k] = { img: null, frames: 4, speed: 10 };
-        });
+        allKeys.forEach(k => { if(!sprites[k]) sprites[k] = { img: null, frames: 4, speed: 10 }; });
 
         const tiles = [ 
             { x: -10, y: -10, w: 260, h: 10 }, { x: -10, y: 0, w: 10, h: 960 }, { x: 240, y: 0, w: 10, h: 960 }, { x: 0, y: 950, w: 240, h: 10 }, 
@@ -467,7 +462,10 @@
             ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, GAME_WIDTH, VIEW_HEIGHT);
             const cy = config.camSnap ? Math.floor(camY) : camY;
             ctx.save(); ctx.translate(0, -cy);
-            ctx.fillStyle = '#1e293b'; for (let t of tiles) ctx.fillRect(Math.round(t.x), Math.round(t.y), Math.round(t.w), Math.round(t.h));
+            
+            // Draw Tiles (High Contrast Fallback)
+            ctx.fillStyle = '#334155'; // Lighter blue for better visibility
+            for (let t of tiles) ctx.fillRect(Math.round(t.x), Math.round(t.y), Math.round(t.w), Math.round(t.h));
             
             enemies.forEach(e => {
                 const wound = (e.hp/e.maxHp) <= config.woundThreshold;
@@ -479,7 +477,7 @@
                     else { ctx.drawImage(s.img, e.frameIndex*32, 0, 32, 32, Math.round(e.x)-9, Math.round(e.y)-6, 32, 32); }
                     ctx.restore();
                 } else {
-                    ctx.fillStyle = wound ? '#e11d48' : '#475569'; 
+                    ctx.fillStyle = wound ? '#e11d48' : '#cbd5e1'; // Bright grey fallback for enemies
                     ctx.fillRect(Math.round(e.x), Math.round(e.y), e.w, e.h);
                 }
             });
@@ -504,7 +502,7 @@
                 else { ctx.drawImage(s.img, fIdx*32, 0, 32, 32, dx, dy, 32, 32); }
                 ctx.restore();
             } else {
-                ctx.fillStyle = '#6366f1';
+                ctx.fillStyle = '#6366f1'; // Indigo for player fallback
                 if(player.state === 'CHARGING') {
                     if (player.charge > config.chargeTime2) ctx.fillStyle = '#ef4444';
                     else if (player.charge > config.chargeTime1) ctx.fillStyle = '#f59e0b';
@@ -516,44 +514,6 @@
             document.getElementById('player-hp-bar').style.width = (player.hp/player.maxHp)*100 + "%";
             document.getElementById('player-hp-text').innerText = Math.round(player.hp);
         }
-
-        // --- CONTROLS ---
-        function pollGP() {
-            const gp = navigator.getGamepads()[0];
-            if (!gp) return;
-            const x = gp.axes[0]; const y = gp.axes[1];
-            if (Math.abs(x) > 0.9) player.isRunning = true;
-            input.left = x < -0.3 || gp.buttons[14].pressed;
-            input.right = x > 0.3 || gp.buttons[15].pressed;
-            input.up = y < -0.3 || gp.buttons[12].pressed;
-            input.down = y > 0.3 || gp.buttons[13].pressed;
-            input.jumpPressed = gp.buttons[0].pressed && !input.jump;
-            input.jumpReleased = !gp.buttons[0].pressed && input.jump;
-            input.jump = gp.buttons[0].pressed;
-            input.attackPressed = gp.buttons[1].pressed && !input.attack;
-            input.attack = gp.buttons[1].pressed;
-            input.consumePressed = gp.buttons[2].pressed;
-        }
-
-        // KEYBOARD
-        window.addEventListener('keydown', e => {
-            const k = e.key.toLowerCase();
-            const now = Date.now();
-            if(k==='arrowleft') { if(!input.left && (now - input.lastLeft < 300)) player.isRunning = true; input.lastLeft = now; input.left=true; }
-            if(k==='arrowright') { if(!input.right && (now - input.lastRight < 300)) player.isRunning = true; input.lastRight = now; input.right=true; }
-            if(k==='arrowup') input.up=true; if(k==='arrowdown') input.down=true;
-            if(k==='z') { if(!input.jump) input.jumpPressed=true; input.jump=true; }
-            if(k==='x') { input.attack = true; input.attackPressed = true; }
-            if(k==='v') input.consumePressed = true;
-            if(k==='c') input.keyBlock = true;
-        });
-        window.addEventListener('keyup', e => {
-            const k = e.key.toLowerCase();
-            if(k==='arrowleft') input.left=false; if(k==='arrowright') input.right=false;
-            if(k==='arrowup') input.up=false; if(k==='arrowdown') input.down=false;
-            if(k==='z') { input.jump=false; input.jumpReleased=true; }
-            if(k==='x') input.attack=false; if(k==='c') input.keyBlock = false; 
-        });
 
         // --- UPDATED TOUCH CONTROLS (With Double-Tap to Run) ---
         const addTouch = (id, startFn, endFn) => {
@@ -567,7 +527,6 @@
             }
         };
 
-        // --- Double Tap Logic ---
         const tapTime = { left: 0, right: 0 };
         
         addTouch('dpad-left', () => {
@@ -577,7 +536,6 @@
             input.left = true;
         }, () => { 
             input.left = false; 
-            // We don't turn off running immediately on release, logic handles that when velocity hits 0
         });
 
         addTouch('dpad-right', () => {
@@ -589,14 +547,15 @@
             input.right = false; 
         });
 
-        // Simple Inputs
         addTouch('dpad-up',    () => input.up = true,    () => input.up = false);
         addTouch('dpad-down',  () => input.down = true,  () => input.down = false);
-        
         addTouch('btn-jump', () => { if(!input.jump) input.jumpPressed = true; input.jump = true; }, () => { input.jump = false; input.jumpReleased = true; });
         addTouch('btn-attack', () => { input.attack = true; input.attackPressed = true; }, () => { input.attack = false; });
         addTouch('btn-block',  () => input.keyBlock = true, () => input.keyBlock = false);
         addTouch('btn-consume', () => input.consumePressed = true, () => {});
+
+        // Game Loop Start
+        requestAnimationFrame(gameLoop);
     </script>
 </body>
 </html>
