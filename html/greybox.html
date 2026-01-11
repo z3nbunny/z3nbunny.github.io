@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>GBA Mechanics Lab - Portfolio Demo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -14,8 +14,21 @@
             touch-action: none; /* Prevents scroll on mobile */
             user-select: none;
             -webkit-user-select: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
-        #game-container { position: relative; image-rendering: pixelated; }
+        
+        #game-container { 
+            position: relative; 
+            image-rendering: pixelated; 
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+        
         canvas { 
             background-color: #0f172a; 
             border: 4px solid #1e293b; 
@@ -23,42 +36,39 @@
             box-shadow: 0 0 40px rgba(0,0,0,0.8);
             
             /* --- RESPONSIVE FIX --- */
-            width: 100%;             /* Fill the available width */
-            max-width: 720px;        /* ...but don't get bigger than 3x scale */
-            height: auto;            /* Auto-calculate height based on width */
-            aspect-ratio: 3 / 2;     /* Enforce the GBA 3:2 ratio (Important!) */
-            
-            /* Center it */
+            width: 100%;            
+            max-width: 720px;       
+            height: auto;           
+            aspect-ratio: 3 / 2;    
             display: block;
-            margin: 0 auto;
         }
         
         /* --- NEW MOBILE CONTROLS CSS --- */
         .control-zone {
             position: absolute;
-            bottom: 20px;
-            width: 140px;
-            height: 140px;
-            /* border: 1px dashed rgba(255,255,255,0.1); Debugging circle */
+            bottom: 60px; /* Adjusted to sit safely above home bars */
+            width: 150px;
+            height: 150px;
+            z-index: 100; /* Super high priority */
         }
-        #zone-left { left: 20px; }
-        #zone-right { right: 20px; }
+        #zone-left { left: 10px; }
+        #zone-right { right: 10px; }
 
         .touch-btn {
             position: absolute;
-            width: 45px; height: 45px;
-            background: rgba(255, 255, 255, 0.15); /* Transparent White */
+            width: 50px; height: 50px; /* Slightly larger targets */
+            background: rgba(255, 255, 255, 0.15); 
             border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 50%;
             display: flex; justify-content: center; align-items: center;
             color: rgba(255,255,255,0.6); 
-            font-weight: 900; font-size: 16px;
+            font-weight: 900; font-size: 18px;
             backdrop-filter: blur(2px);
             transition: background 0.1s, transform 0.1s;
             user-select: none;
+            touch-action: none;
         }
 
-        /* Opaque on Touch */
         .touch-btn:active, .touch-btn.pressed { 
             background: rgba(255, 255, 255, 0.5); 
             color: #fff;
@@ -72,13 +82,9 @@
         #dpad-right { top: 50%; right: 0; transform: translateY(-50%); }
 
         /* ACTION BUTTONS (Diamond Layout) */
-        /* Up: Consume */
         #btn-consume { top: 0; left: 50%; transform: translateX(-50%); border-color: #fbbf24; color: #fbbf24; }
-        /* Down: Attack */
         #btn-attack  { bottom: 0; left: 50%; transform: translateX(-50%); border-color: #818cf8; color: #818cf8; }
-        /* Left: Block */
         #btn-block   { top: 50%; left: 0; transform: translateY(-50%); border-color: #38bdf8; color: #38bdf8; }
-        /* Right: Jump */
         #btn-jump    { top: 50%; right: 0; transform: translateY(-50%); border-color: #fb7185; color: #fb7185; }
 
         /* Hide on Desktop */
@@ -87,12 +93,12 @@
         }
     </style>
 </head>
-<body class="flex flex-col h-screen items-center justify-center">
+<body>
 
     <div id="game-container">
         <canvas id="gameCanvas" width="240" height="160"></canvas>
         
-        <div id="hud" class="absolute top-4 left-4 flex flex-col gap-1 pointer-events-none">
+        <div id="hud" class="absolute top-4 left-4 flex flex-col gap-1 pointer-events-none z-10">
             <div class="flex items-center gap-2">
                 <div class="w-32 h-3 bg-slate-800 rounded-full border border-slate-700 overflow-hidden">
                     <div id="player-hp-bar" class="h-full bg-rose-500 transition-all duration-300" style="width: 100%;"></div>
@@ -106,7 +112,7 @@
         </div>
     </div>
 
-    <div id="mobile-controls" class="fixed inset-0 pointer-events-none z-40">
+    <div id="mobile-controls" class="fixed inset-0 pointer-events-none z-50">
         
         <div id="zone-left" class="control-zone pointer-events-auto">
             <div id="dpad-up" class="touch-btn">▲</div>
@@ -116,7 +122,11 @@
         </div>
 
         <div id="zone-right" class="control-zone pointer-events-auto">
-            <div id="btn-consume" class="touch-btn">V</div> <div id="btn-block" class="touch-btn">C</div>   <div id="btn-jump" class="touch-btn">Z</div>    <div id="btn-attack" class="touch-btn">X</div>  </div>
+            <div id="btn-consume" class="touch-btn">V</div> 
+            <div id="btn-block" class="touch-btn">C</div>   
+            <div id="btn-jump" class="touch-btn">Z</div>    
+            <div id="btn-attack" class="touch-btn">X</div>  
+        </div>
 
     </div>
 
@@ -136,7 +146,7 @@
         const WORLD_HEIGHT = 960; 
         ctx.imageSmoothingEnabled = false;
 
-        // --- 1. SCROLL FIX: Prevent Default Browser Behavior ---
+        // --- 1. SCROLL FIX ---
         window.addEventListener('keydown', function(e) {
             if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight", "Space"].indexOf(e.code) > -1) {
                 e.preventDefault();
@@ -158,7 +168,6 @@
             camLerp: 0.08, camDeadzone: 5, camSnap: 1
         };
 
-        // INPUT STATE
         const input = { left: false, right: false, up: false, down: false, jump: false, jumpPressed: false, jumpReleased: false, attack: false, attackPressed: false, consumePressed: false, keyBlock: false, gpBlock: false, lastLeft: 0, lastRight: 0 };
         
         const player = { 
@@ -176,12 +185,8 @@
         ];
         let deadEnemies = [];
 
-        // --- 2. ASSET LOADING (The Professional Way) ---
-        // Instead of LocalStorage, we load images from the folder so EVERYONE can see them.
+        // --- 2. ASSET LOADING ---
         const sprites = {};
-        
-        // Define your sprites here. 
-        // TIP: You need to put your PNG files into the 'images' folder!
         const assetManifest = [
             { key: 'IDLE', src: '../images/solry_sprites/hero_idle.png', frames: 4, speed: 10 },
             { key: 'WALK', src: '../images/solry_sprites/hero_walk.png', frames: 4, speed: 8 },
@@ -194,27 +199,21 @@
             { key: 'CHARGING', src: '../images/solry_sprites/hero_charge_short.png', frames: 1, speed: 5 },
             { key: 'ATTACK_FWD', src: '../images/solry_sprites/hero_attack_fwd.png', frames: 6, speed: 4 },
             { key: 'CONSUME', src: '../images/solry_sprites/hero_consume.png', frames: 6, speed: 6 },
-            // ENEMIES
-            { key: 'ENEMY_IDLE', src: '../images/solry_sprites/enemy_1_idle.png', frames: 4, speed: 10 },
-            // Add the rest of your files here...
+            { key: 'ENEMY_IDLE', src: '../images/solry_sprites/enemy_1_idle.png', frames: 4, speed: 10 }
         ];
 
-        // Load them
         assetManifest.forEach(def => {
             sprites[def.key] = { img: null, frames: def.frames, speed: def.speed };
             const img = new Image();
             img.src = def.src;
             img.onload = () => { sprites[def.key].img = img; };
-            // If image fails to load, it stays null (Colored Box fallback)
         });
         
-        // Fill in missing keys with fallbacks so the game doesn't crash
         const allKeys = ['IDLE', 'WALK', 'RUN', 'JUMP', 'FALL', 'LAND', 'WALL_SLIDE', 'BLOCK', 'CHARGING', 'ATTACK_FWD', 'ATTACK_UP', 'ATTACK_DOWN', 'CONSUME', 'ENEMY_IDLE'];
         allKeys.forEach(k => {
             if(!sprites[k]) sprites[k] = { img: null, frames: 4, speed: 10 };
         });
 
-        // --- LEVEL DATA ---
         const tiles = [ 
             { x: -10, y: -10, w: 260, h: 10 }, { x: -10, y: 0, w: 10, h: 960 }, { x: 240, y: 0, w: 10, h: 960 }, { x: 0, y: 950, w: 240, h: 10 }, 
             { x: 30, y: 900, w: 60, h: 10 }, { x: 150, y: 880, w: 60, h: 10 }, { x: 80, y: 850, w: 80, h: 10 },
@@ -223,7 +222,6 @@
             { x: 180, y: 280, w: 40, h: 80 }, { x: 100, y: 450, w: 40, h: 10 } 
         ];
 
-        // --- LOOP ---
         let lastTime = 0;
         let accumulator = 0;
         const TIMESTEP = 1000 / 60; 
@@ -473,7 +471,7 @@
             
             enemies.forEach(e => {
                 const wound = (e.hp/e.maxHp) <= config.woundThreshold;
-                const s = sprites['ENEMY_IDLE']; // Use sprite for enemy if available
+                const s = sprites['ENEMY_IDLE']; 
                 if (s && s.img) {
                     ctx.save();
                     if (wound) ctx.filter = 'brightness(0.6) sepia(1) hue-rotate(-50deg)';
@@ -557,48 +555,47 @@
             if(k==='x') input.attack=false; if(k==='c') input.keyBlock = false; 
         });
 
-        // --- UPDATED TOUCH CONTROLS ---
+        // --- UPDATED TOUCH CONTROLS (With Double-Tap to Run) ---
         const addTouch = (id, startFn, endFn) => {
             const el = document.getElementById(id);
             if(el) {
-                // PreventDefault on touchstart stops the browser from zooming/scrolling
                 el.addEventListener('touchstart', (e) => { e.preventDefault(); el.classList.add('pressed'); startFn(); });
-                // Handle touchend/touchcancel/touchleave
                 const stop = (e) => { e.preventDefault(); el.classList.remove('pressed'); if(endFn) endFn(); };
                 el.addEventListener('touchend', stop);
                 el.addEventListener('touchcancel', stop);
-                el.addEventListener('mouseleave', stop); // Mouse fallback
+                el.addEventListener('mouseleave', stop); 
             }
         };
 
-        // D-Pad
+        // --- Double Tap Logic ---
+        const tapTime = { left: 0, right: 0 };
+        
+        addTouch('dpad-left', () => {
+            const now = Date.now();
+            if (now - tapTime.left < 300) player.isRunning = true;
+            tapTime.left = now;
+            input.left = true;
+        }, () => { 
+            input.left = false; 
+            // We don't turn off running immediately on release, logic handles that when velocity hits 0
+        });
+
+        addTouch('dpad-right', () => {
+            const now = Date.now();
+            if (now - tapTime.right < 300) player.isRunning = true;
+            tapTime.right = now;
+            input.right = true;
+        }, () => { 
+            input.right = false; 
+        });
+
+        // Simple Inputs
         addTouch('dpad-up',    () => input.up = true,    () => input.up = false);
         addTouch('dpad-down',  () => input.down = true,  () => input.down = false);
-        addTouch('dpad-left',  () => input.left = true,  () => input.left = false);
-        addTouch('dpad-right', () => input.right = true, () => input.right = false);
-
-        // Actions (Diamond Layout)
-        // Right: Jump (Z)
-        addTouch('btn-jump', () => { 
-            if(!input.jump) input.jumpPressed = true; 
-            input.jump = true; 
-        }, () => { 
-            input.jump = false; 
-            input.jumpReleased = true; 
-        });
-
-        // Down: Attack (X)
-        addTouch('btn-attack', () => { 
-            input.attack = true; 
-            input.attackPressed = true; 
-        }, () => { 
-            input.attack = false; 
-        });
-
-        // Left: Block (C)
+        
+        addTouch('btn-jump', () => { if(!input.jump) input.jumpPressed = true; input.jump = true; }, () => { input.jump = false; input.jumpReleased = true; });
+        addTouch('btn-attack', () => { input.attack = true; input.attackPressed = true; }, () => { input.attack = false; });
         addTouch('btn-block',  () => input.keyBlock = true, () => input.keyBlock = false);
-
-        // Up: Consume (V)
         addTouch('btn-consume', () => input.consumePressed = true, () => {});
     </script>
 </body>
