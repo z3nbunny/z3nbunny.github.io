@@ -486,31 +486,68 @@ canvas#gameCanvas { display: block; width: 100%; height: auto; }
    8. FOOTER
    ========================================= */
 footer {
-    padding: 5vw 0;
+    padding: 4em 0;
     width: 100%;
     text-align: center;
-    background: url('../images/mark-basarab-1OtUkD_8svc-unsplash.jpg') no-repeat center center;
-    background-size: cover;
+    background-color: white;
+    border-top: 1px solid var(--color-border-light);
+    
+    /* Global Footer Color: Black */
+    color: var(--color-text-primary); 
 }
 
 .footer_content {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 2em;
+}
+
+footer p {
+    margin-bottom: 0.5em;
+    font-size: 0.9rem; 
+    line-height: 1.6;
+}
+
+/* --- The Native Details/Summary Styles --- */
+
+details.credits-dropdown {
+    margin-top: 2em;
+    border-top: 1px solid #eee; 
+    padding-top: 1em;
     display: inline-block;
-    padding: 2em;
-    background: rgba(255, 255, 255, 0.8);
+    text-align: center;
+    
+    font-size: 0.9rem; 
+    color: var(--color-text-primary); /* Black */
 }
 
-#creditsList { list-style: none; padding: 0; margin-top: 1em; }
-#creditsList.hidden { display: none; }
+summary {
+    cursor: pointer;
+    list-style: none; 
+    font-weight: 600;
+    transition: opacity 0.2s;
+}
 
-#toggleCredits {
-    background-color: var(--color-dark-gray);
-    color: var(--color-text-light);
-    border: none;
-    padding: 0.5em 1em;
-    border-radius: 5px;
+summary:hover {
+    text-decoration: underline;
+}
+
+summary::-webkit-details-marker {
+    display: none; 
+}
+
+.credits-list {
+    list-style: none;
+    padding: 0;
     margin-top: 1em;
+    text-align: center;
 }
 
+.credits-list li {
+    margin-bottom: 0.5em;
+    font-size: 0.9em; 
+    color: var(--color-text-primary); /* Black */
+}
 /* =========================================
    9. MEDIA QUERIES
    ========================================= */
