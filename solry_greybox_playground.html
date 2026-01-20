@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GBA Mechanics Lab - v5.34 (Block Fix)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #020617; color: #f8fafc; font-family: 'Inter', sans-serif; overflow: hidden; }
+        #game-container { position: relative; image-rendering: pixelated; }
+        canvas { 
+            background-color: #0f172a; 
+            border: 4px solid #1e293b; 
+            border-radius: 4px; 
+            box-shadow: 0 0 40px rgba(0,0,0,0.8);
+            width: 720px;
+            height: 480px; 
+        }
+        #devtools { height: 100vh; overflow-y: auto; scrollbar-width: thin; scrollbar-color: #334155 #020617; }
+        .control-group { border-bottom: 1px solid #1e293b; padding-bottom: 1rem; margin-bottom: 1rem; }
+        .label-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem; }
+        .control-label { font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }
+        input[type="number"] { background: #0f172a; border: 1px solid #334155; border-radius: 4px; padding: 2px 4px; font-size: 11px; width: 50px; text-align: center; color: #818cf8; }
+        input[type="range"] { accent-color: #6366f1; height: 4px; }
+        .save-item { background: #0f172a; border: 1px solid #1e293b; padding: 0.5rem; border-radius: 4px; margin-bottom: 0.4rem; display: flex; justify-content: space-between; align-items: center; font-size: 11px; }
+    </style>
+</head>
+<body class="flex h-screen">
+
+    <div class="flex-1 flex flex-col items-center justify-center bg-slate-950 relative">
+        <div id="game-container">
+            <canvas id="gameCanvas" width="240" height="160"></canvas>
+            <div id="hud" class="absolute top-2 left-2 flex flex-col gap-1 pointer-events-none">
+                <div class="flex items-center gap-1">
+                    <div class="w-20 h-2 bg-slate-800 rounded-full border border-slate-700 overflow-hidden">
+                        <div id="player-hp-bar" class="h-full bg-rose-500 transition-all duration-300" style="width: 100%;"></div>
+                    </div>
+                    <span id="player-hp-text" class="text-[8px] font-black text-rose-400">100 HP</span>
+                </div>
+                <div class="bg-slate-950/90 p-1 rounded border border-slate-800 text-[8px] font-mono text-cyan-400 opacity-80">
+                    <span id="debug-state" class="text-white">IDLE</span> | 
+                    <span id="debug-run" class="text-slate-500 font-bold">WALK</span> | 
+                    <span id="debug-fps" class="text-yellow-300">60</span> FPS
+                </div>
+            </div>
+            <div id="notification" class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-indigo-600 text-white px-2 py-1 rounded text-[9px] font-bold opacity-0 transition-opacity pointer-events-none z-50 shadow-lg">
+                v5.34 (Block Fix)
+            </div>
+        </div>
+
+        <div class="mt-4 flex gap-4 text-[9px] font-bold text-slate-500 uppercase tracking-widest text-center">
+            <div><b class="text-indigo-400">ARROWS</b> Move (Double Tap Run)</div>
+            <div><b class="text-indigo-400">Z</b> Jump</div>
+            <div><b class="text-indigo-400">X</b> Attack</div>
+            <div><b class="text-indigo-400">C</b> Block</div>
+            <div><b class="text-indigo-400">V</b> Consume</div>
+        </div>
+    </div>
+
+    <div id="devtools" class="w-[420px] bg-slate-950 border-l border-slate-800 p-6 shadow-2xl">
+        <div class="mb-6 bg-slate-900 border border-slate-800 p-4 rounded-xl shadow-inner">
+            <h3 class="text-xs font-black text-indigo-400 uppercase tracking-tighter mb-4">v5.34 Persistence</h3>
+            <div class="flex gap-2 mb-4">
+                <input type="text" id="preset-name" placeholder="Name build..." class="flex-1 bg-black border border-slate-800 rounded px-3 py-2 text-xs outline-none focus:border-indigo-500 text-indigo-100">
+                <button id="btn-save-local" class="bg-indigo-600 hover:bg-indigo-500 px-3 py-2 rounded text-[10px] font-black uppercase tracking-widest">Save</button>
+            </div>
+            <div id="local-list" class="max-h-32 overflow-y-auto space-y-1 mb-4"></div>
+            <div class="flex gap-2 mb-2">
+                <button onclick="exportToFile()" class="flex-1 py-1.5 bg-slate-800 hover:bg-slate-700 rounded text-[9px] font-bold uppercase text-white">Export</button>
+                <label class="flex-1 py-1.5 bg-slate-800 hover:bg-slate-700 rounded text-[9px] font-bold uppercase text-center cursor-pointer text-white">
+                    Import <input type="file" id="import-file" accept=".json" class="hidden">
+                </label>
+            </div>
+            <button onclick="factoryReset()" class="w-full py-1.5 bg-red-900/30 hover:bg-red-900/50 text-red-400 border border-red-900/50 rounded text-[9px] font-black uppercase tracking-widest">Factory Reset</button>
+        </div>
+
+        <div class="space-y-6">
+            <section class="control-group" id="ui-locomotion-container">
+                <h4 class="text-[10px] font-black text-slate-500 mb-4 flex items-center gap-2"><div class="w-1 h-3 bg-indigo-500"></div> LOCOMOTION</h4>
+                <div id="ui-locomotion"></div>
+            </section>
+            <section class="control-group" id="ui-jump-container">
+                <h4 class="text-[10px] font-black text-slate-500 mb-4 flex items-center gap-2"><div class="w-1 h-3 bg-cyan-500"></div> JUMP & GRAVITY</h4>
+                <div id="ui-jump"></div>
+            </section>
+            <section class="control-group" id="ui-combat-container">
+                <h4 class="text-[10px] font-black text-slate-500 mb-4 flex items-center gap-2"><div class="w-1 h-3 bg-rose-500"></div> COMBAT & CONSUME</h4>
+                <div id="ui-combat"></div>
+            </section>
+             <section class="control-group" id="ui-camera-container">
+                <h4 class="text-[10px] font-black text-slate-500 mb-4 flex items-center gap-2"><div class="w-1 h-3 bg-yellow-500"></div> CAMERA</h4>
+                <div id="ui-camera"></div>
+            </section>
+            <section class="pb-20">
+                <h4 class="text-[10px] font-black text-slate-500 mb-4 flex items-center gap-2"><div class="w-1 h-3 bg-emerald-500"></div> ASSETS</h4>
+                <div id="sprite-slots" class="space-y-4"></div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const GAME_WIDTH = 240; 
+        const VIEW_HEIGHT = 160;
+        const WORLD_HEIGHT = 960; 
+        ctx.imageSmoothingEnabled = false;
+
+        const DEFAULT_CONFIG = {
+            walkAccel: 0.24, walkMax: 1.32, runAccel: 0.42, runMax: 2.88,
+            frictionGround: 0.82, frictionAir: 0.98, airAccel: 0.12,
+            gravity: 0.27, jumpForce: 5.4, jumpCut: 0.5,
+            maxFall: 6.0, coyoteFrames: 6, jumpBuffer: 6, maxJumps: 2,
+            wallFriction: 0.7, wallKickX: 2.4, wallKickY: 4.8,
+            atkLunge: 2.1, conLock: 60, conLunge: 3.0,
+            chargeLunge: 3.6, chargeMoveSpeed: 0.0,
+            knockback: 4.2, hitboxW: 14, hitboxH: 24, 
+            blockSpeedScale: 0.4,
+            chargeTime1: 30, chargeTime2: 60,
+            enemyPatrolSpeed: 0.3, woundThreshold: 0.33,
+            camLerp: 0.08, camDeadzone: 5, camSnap: 1,
+            savedSprites: {}, savedFrames: {}, savedSpeeds: {} 
+        };
+
+        let config = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
+
+        const tunables = [
+            { cat: 'locomotion', key: 'walkAccel', label: 'Walk Accel', min: 0.05, max: 2, step: 0.05 },
+            { cat: 'locomotion', key: 'walkMax', label: 'Walk Max Spd', min: 0.5, max: 6, step: 0.1 },
+            { cat: 'locomotion', key: 'runAccel', label: 'Run Accel', min: 0.05, max: 2, step: 0.05 },
+            { cat: 'locomotion', key: 'runMax', label: 'Run Max Spd', min: 1, max: 8, step: 0.1 },
+            { cat: 'locomotion', key: 'frictionGround', label: 'Gnd Friction', min: 0.5, max: 0.99, step: 0.01 },
+            { cat: 'jump', key: 'gravity', label: 'Gravity', min: 0.05, max: 1.0, step: 0.05 },
+            { cat: 'jump', key: 'jumpForce', label: 'Jump Force', min: 2, max: 12, step: 0.1 },
+            { cat: 'jump', key: 'jumpCut', label: 'Jump Cut', min: 0.1, max: 0.9, step: 0.05 },
+            { cat: 'jump', key: 'wallKickX', label: 'Wall Kick X', min: 0, max: 8, step: 0.5 },
+            { cat: 'combat', key: 'atkLunge', label: 'Atk Lunge', min: 0, max: 8, step: 0.1 },
+            { cat: 'combat', key: 'chargeLunge', label: 'Charge Lunge', min: 0, max: 12, step: 0.5 },
+            { cat: 'combat', key: 'knockback', label: 'Knockback', min: 0, max: 10, step: 0.5 },
+            { cat: 'camera', key: 'camLerp', label: 'Cam Speed', min: 0.01, max: 0.5, step: 0.01 }
+        ];
+
+        tunables.forEach(t => {
+            const container = document.getElementById(`ui-${t.cat}`);
+            const div = document.createElement('div');
+            div.className = 'mb-4';
+            div.innerHTML = `
+                <div class="label-row">
+                    <label class="control-label text-slate-500">${t.label}</label>
+                    <input type="number" id="num-${t.key}" value="${config[t.key]}" step="${t.step}">
+                </div>
+                <input type="range" id="rng-${t.key}" min="${t.min}" max="${t.max}" step="${t.step}" value="${config[t.key]}" class="w-full">
+            `;
+            container.appendChild(div);
+            const nI = div.querySelector(`#num-${t.key}`);
+            const rI = div.querySelector(`#rng-${t.key}`);
+            const upd = (val) => { 
+                let num = parseFloat(val);
+                if (isNaN(num)) return;
+                config[t.key] = num; nI.value = val; rI.value = val;
+                saveCurrentToLocal();
+            };
+            nI.oninput = e => upd(e.target.value);
+            rI.oninput = e => upd(e.target.value);
+        });
+
+        // INPUT STATE - SPLIT BLOCK
+        const input = { left: false, right: false, up: false, down: false, jump: false, jumpPressed: false, jumpReleased: false, attack: false, attackPressed: false, consumePressed: false, 
+            keyBlock: false, gpBlock: false, // SPLIT BLOCKING INPUTS
+            lastLeft: 0, lastRight: 0 
+        };
+        
+        const player = { 
+            x: 100, y: 926, 
+            velX: 0, velY: 0, 
+            hp: 100, maxHp: 100, 
+            isGrounded: false, isWallSliding: false, wallDir: 0,
+            facingRight: true, 
+            state: 'IDLE', isRunning: false, 
+            animTimer: 0, frameIndex: 0, 
+            coyote: 0, buffer: 0, jumpsDone: 0,
+            lock: 0, charge: 0, lastChargeMult: 1,
+            invulnTimer: 0, hitEnemies: [],
+            debugHitTimer: 0, debugHitbox: {x:0,y:0,w:0,h:0},
+            consumeHit: false 
+        };
+        
+        let camY = 800;
+        let enemies = [
+            { id: 1, x: 60, y: 926, w: 14, h: 24, hp: 100, maxHp: 100, animTimer: 0, frameIndex: 0, kbX: 0, startX: 60, dir: 1, range: 40, beingConsumed: false },
+            { id: 2, x: 180, y: 926, w: 14, h: 24, hp: 30, maxHp: 100, animTimer: 0, frameIndex: 0, kbX: 0, startX: 180, dir: -1, range: 40, beingConsumed: false }
+        ];
+        let deadEnemies = [];
+
+        const sprites = {};
+        const spriteDefs = [
+            { key: 'IDLE', frames: 4, speed: 10 }, { key: 'WALK', frames: 4, speed: 8 }, { key: 'RUN', frames: 4, speed: 6 },
+            { key: 'JUMP', frames: 3, speed: 6 }, { key: 'FALL', frames: 4, speed: 10 }, { key: 'LAND', frames: 3, speed: 5 },
+            { key: 'WALL_SLIDE', frames: 2, speed: 10 }, { key: 'BLOCK', frames: 6, speed: 10 }, { key: 'CHARGING', frames: 1, speed: 6 },
+            { key: 'ATTACK_FWD', frames: 6, speed: 4 }, { key: 'ATTACK_UP', frames: 9, speed: 4 }, { key: 'ATTACK_DOWN', frames: 4, speed: 4 }, 
+            { key: 'CONSUME', frames: 6, speed: 6 },
+            { key: 'ENEMY_IDLE', frames: 4, speed: 10 }, { key: 'ENEMY_WOUNDED', frames: 4, speed: 20 }
+        ];
+
+        spriteDefs.forEach(def => {
+            sprites[def.key] = { img: null, frames: def.frames, speed: def.speed };
+            const div = document.createElement('div');
+            div.className = 'bg-black/40 p-3 rounded border border-slate-900';
+            div.innerHTML = `
+                <div class="flex justify-between items-center mb-2">
+                    <label class="text-[9px] font-black uppercase text-slate-500">${def.key}</label>
+                    <span id="st-${def.key}" class="text-[8px] text-slate-700 italic">EMPTY</span>
+                </div>
+                <input type="file" id="up-${def.key}" accept="image/png" class="block w-full text-[10px] text-slate-600 mb-2">
+                 <div class="flex gap-4">
+                    <div class="flex flex-col"><span class="text-[7px] text-slate-600 uppercase font-bold">Frames</span><input type="number" id="f-${def.key}" value="${def.frames}" class="w-12 bg-black border border-slate-800 text-[10px] text-center rounded"></div>
+                    <div class="flex flex-col"><span class="text-[7px] text-slate-600 uppercase font-bold">Delay</span><input type="number" id="s-${def.key}" value="${def.speed}" class="w-12 bg-black border border-slate-800 text-[10px] text-center rounded"></div>
+                </div>
+            `;
+            document.getElementById('sprite-slots').appendChild(div);
+            
+            document.getElementById(`f-${def.key}`).oninput = e => { sprites[def.key].frames = parseInt(e.target.value)||1; config.savedFrames[def.key] = parseInt(e.target.value); saveCurrentToLocal(); };
+            document.getElementById(`s-${def.key}`).oninput = e => { sprites[def.key].speed = parseInt(e.target.value)||1; config.savedSpeeds[def.key] = parseInt(e.target.value); saveCurrentToLocal(); };
+            
+            document.getElementById(`up-${def.key}`).onchange = e => {
+                const reader = new FileReader();
+                reader.onload = ev => {
+                    loadSpriteFromData(def.key, ev.target.result);
+                    config.savedSprites[def.key] = ev.target.result;
+                    saveCurrentToLocal();
+                };
+                reader.readAsDataURL(e.target.files[0]);
+            };
+        });
+        function loadSpriteFromData(key, dataUrl) {
+            const img = new Image();
+            img.onload = () => { sprites[key].img = img; document.getElementById(`st-${key}`).innerText = "ACTIVE"; document.getElementById(`st-${key}`).className = "text-[8px] text-emerald-500 font-bold"; };
+            img.src = dataUrl;
+        }
+
+        const tiles = [ 
+            // --- BOUNDARIES ---
+            { x: -10, y: -10, w: 260, h: 10 },    // Ceiling
+            { x: -10, y: 0, w: 10, h: 960 },      // Left Wall
+            { x: 240, y: 0, w: 10, h: 960 },      // Right Wall
+            { x: 0, y: 950, w: 240, h: 10 },      // Floor (New Bottom)
+
+            // --- ZONE 1: THE GROUND (Original Layout Shifted) ---
+            { x: 30, y: 900, w: 60, h: 10 }, 
+            { x: 150, y: 880, w: 60, h: 10 }, 
+            { x: 80, y: 850, w: 80, h: 10 },
+
+            // --- ZONE 2: THE CLIMB (Vertical Sections) ---
+            { x: 0, y: 780, w: 50, h: 10 },       // Left Step
+            { x: 190, y: 720, w: 50, h: 10 },     // Right Step
+            { x: 40, y: 650, w: 40, h: 10 },      // Mid Small
+            { x: 110, y: 580, w: 130, h: 10 },    // Wide Platform
+            { x: 0, y: 500, w: 60, h: 10 },       // Left High
+
+            // --- ZONE 3: THE CHALLENGE (Top Section) ---
+            // The Launchpad (Stand here to jump)
+            { x: 20, y: 350, w: 40, h: 10 },
+            
+            // The Floating Island (Target)
+            // It is far to the right and high up.
+            // You must: Run Jump -> Air Jump -> Wall Slide (Left Side) -> Wall Kick to top
+            { x: 180, y: 280, w: 40, h: 80 },     // The Tall Block
+            
+            // A safety catcher below the challenge so you don't fall all the way down
+            { x: 100, y: 450, w: 40, h: 10 } 
+        ];
+
+        let lastTime = 0;
+        let accumulator = 0;
+        const TIMESTEP = 1000 / 60; 
+
+        function gameLoop(timestamp) {
+            if (!lastTime) lastTime = timestamp;
+            let deltaTime = timestamp - lastTime;
+            lastTime = timestamp;
+            if (deltaTime > 1000) deltaTime = 1000;
+
+            accumulator += deltaTime;
+            while (accumulator >= TIMESTEP) {
+                updatePhysics();
+                accumulator -= TIMESTEP;
+            }
+
+            render();
+            if (Math.random() < 0.05) document.getElementById('debug-fps').innerText = Math.round(1000/deltaTime);
+            requestAnimationFrame(gameLoop);
+        }
+
+        // --- 5.19 UPDATE LOGIC (PORTED) ---
+        function updatePhysics() {
+            pollGP();
+
+            const lock = ['ATTACK_FWD', 'ATTACK_UP', 'ATTACK_DOWN', 'LAND'].includes(player.state);
+            
+            // NaN Safety
+            if (isNaN(player.x) || isNaN(player.y) || isNaN(player.velX) || isNaN(player.velY)) {
+                console.error("NaN Reset"); window.resetPlayer(); return;
+            }
+
+            // --- FIX: Void Safety Net ---
+            // If player falls below the world (y > 400), reset them
+            if (player.y > 1100) {
+                window.resetPlayer();
+                return;
+            }
+
+            // Wall Check (From 5.19)
+            player.isWallSliding = false;
+            if (!player.isGrounded && player.velY > 0) {
+                if (input.left && checkWall('left')) { player.isWallSliding = true; player.wallDir = -1; }
+                if (input.right && checkWall('right')) { player.isWallSliding = true; player.wallDir = 1; }
+            }
+
+            // COMBINED BLOCK STATE
+            const isBlocking = input.keyBlock || input.gpBlock;
+
+            if (!lock) {
+                if (input.attackPressed) {
+                    player.animTimer = 0; player.frameIndex = 0;
+                    if (input.up) {
+                        player.state = 'ATTACK_UP'; player.hitEnemies = [];
+                    } else if (!player.isGrounded && input.down) {
+                        player.state = 'ATTACK_DOWN'; player.hitEnemies = [];
+                    } else {
+                        player.state = 'CHARGING'; 
+                        player.charge = 0;
+                        player.velX = 0; // Stop momentum immediately on ground start
+                    }
+                    input.attackPressed = false;
+                }
+                else if (input.consumePressed) {
+                    player.animTimer = 0;
+                    player.frameIndex = 0;
+                    player.consumeHit = false;
+
+                    player.state = 'CONSUME'; 
+                    player.velX = player.facingRight ? config.conLunge : -config.conLunge;
+
+                    input.consumePressed = false; 
+                }
+
+                else {
+                    let acc = player.isGrounded ? (player.isRunning ? config.runAccel : config.walkAccel) : config.airAccel;
+                    let fric = player.isGrounded ? config.frictionGround : config.frictionAir;
+                    let max = player.isRunning ? config.runMax : config.walkMax;
+
+                    if (isBlocking) { acc *= config.blockSpeedScale; max *= config.blockSpeedScale; }
+
+                    if (input.left) player.velX -= acc; 
+                    else if (input.right) player.velX += acc; 
+                    else player.velX *= fric;
+
+                    player.velX = Math.max(-max, Math.min(max, player.velX));
+                    if(Math.abs(player.velX) < 0.1 && !input.left && !input.right) { 
+                        player.velX = 0; 
+                        player.isRunning = false; // Only stop running when we actually stop moving
+                    }
+                    if(player.velX !== 0) player.facingRight = player.velX > 0;
+
+                    // JUMP LOGIC
+                    if (player.isGrounded) {
+                        player.coyote = config.coyoteFrames || 6; 
+                        player.jumpsDone = 0;
+                    } else {
+                        player.coyote--;
+                    }
+
+                    if (input.jumpPressed) player.buffer = config.jumpBuffer || 6; else if(player.buffer > 0) player.buffer--;
+                    
+                    if (player.buffer > 0) {
+                        if (player.isWallSliding) {
+                            player.velY = -config.jumpForce;
+                            player.velX = -player.wallDir * (config.wallKickX || 4);
+                            player.buffer = 0; player.jumpsDone = 1;
+                        }
+                        else if (player.isGrounded || player.coyote > 0) {
+                            player.velY = -(config.jumpForce || 9.0); 
+                            player.isGrounded = false; player.coyote = 0; player.buffer = 0;
+                            player.jumpsDone = 1;
+                            player.state = 'JUMP'; player.animTimer = 0; player.frameIndex = 0;
+                            input.jumpReleased = false; 
+                        } 
+                        else if (player.jumpsDone < config.maxJumps) {
+                            player.velY = -(config.jumpForce || 9.0); 
+                            player.buffer = 0;
+                            player.jumpsDone++;
+                            player.state = 'JUMP'; player.animTimer = 0; player.frameIndex = 0;
+                            input.jumpReleased = false;
+                        }
+                    }
+                }
+            }
+
+            // LEDGE PROTECTION (Updated)
+            // We now check for ATTACK_FWD OR CONSUME
+            if ((player.state === 'ATTACK_FWD' || player.state === 'CONSUME') && player.isGrounded) {
+                const checkX = player.facingRight ? player.x + config.hitboxW : player.x;
+                
+                // Look ahead logic: If the next pixel is empty (not floor), stop X movement
+                if (!isPointOverFloor(checkX + (player.velX || 0), player.y + config.hitboxH + 2)) {
+                    player.velX = 0;
+                }
+            }
+
+            if (player.isWallSliding && player.velY > 0) {
+                player.velY = 1.0; 
+            } else {
+                if (input.jumpReleased && player.velY < 0) { player.velY *= config.jumpCut; input.jumpReleased = false; }
+                player.velY = Math.min(player.velY + config.gravity, config.maxFall);
+            }
+            
+            player.x += (player.velX || 0); checkCol('x');
+            player.y += (player.velY || 0); const wasGnd = player.isGrounded; checkCol('y');
+
+            // Landing
+            const isAttackingState = ['ATTACK_FWD', 'ATTACK_UP', 'ATTACK_DOWN', 'CONSUME'].includes(player.state);
+            if (!wasGnd && player.isGrounded && player.state !== 'LAND' && player.state !== 'CHARGING' && !isAttackingState) { 
+                player.state = 'LAND'; player.frameIndex = 0; player.animTimer = 0; 
+            }
+            
+            // ANIMATION / LOGIC UPDATE
+            const s = sprites[player.state];
+            let defaultFrames = 4;
+            if (player.state === 'CONSUME') defaultFrames = sprites.CONSUME?.frames || 6;
+
+            
+            const fr = Math.max(1, (s && s.img) ? s.frames : defaultFrames);
+            const sp = Math.max(1, (s && s.img) ? s.speed : 10);
+            
+            player.animTimer++;
+
+            if (lock || player.state === 'CONSUME') {
+                if (player.state.startsWith('ATTACK')) {
+                      let mult = (player.state === 'ATTACK_FWD' && player.lastChargeMult) ? player.lastChargeMult : 1.0;
+                      runCombatLogic(player.state === 'ATTACK_FWD' ? 'CHARGE_RELEASE' : 'NORMAL'); 
+                }
+
+                if (player.state === 'CONSUME') {
+                    //player.velX *= 0.92;
+
+                    if (player.frameIndex === 3 && !player.consumeHit) {
+                        checkConsume();
+                        player.consumeHit = true;
+                    }
+
+                    if (player.frameIndex === fr - 1) {
+                        player.state = player.isGrounded ? 'IDLE' : 'FALL';
+                    }
+                }
+
+                else if (player.state === 'ATTACK_FWD') {
+                    if (player.isGrounded) player.velX *= 0.94; else player.velX *= 0.90; 
+                    if (player.frameIndex >= fr - 1 && player.animTimer >= sp - 1) player.state = player.isGrounded ? 'IDLE' : 'FALL';
+                }
+                else if (player.frameIndex >= fr - 1 && player.animTimer >= sp - 1) {
+                    player.state = player.isGrounded ? 'IDLE' : 'FALL';
+                }
+                } else if (player.state === 'CHARGING') {
+                    // 1. Button Held: Accumulate Charge
+                    if (input.attack || input.gpAttack) {
+                    player.charge++;
+                    
+                        // Apply heavy friction while charging (Ground stops, Air drifts)
+                        const f = player.isGrounded ? 0.5 : 0.95; 
+                        player.velX *= f;
+                    } 
+                    // 2. Button Released: EXECUTE ATTACK
+                    else {
+                        let mult = 1.0;
+                    
+                        // Determine Multiplier
+                        if (player.charge > config.chargeTime2) mult = 2.0;       // > 1.0s
+                        else if (player.charge > config.chargeTime1) mult = 1.5;  // > 0.5s
+                    
+                        // Apply Lunge Velocity (Forward)
+                        // Note: We use chargeLunge for charged, but atkLunge for quick taps
+                        const force = (mult > 1.0) ? config.chargeLunge : config.atkLunge;
+                        const boost = (mult > 1.0) ? mult : 1.5; // Speed boost for quick taps
+
+                        player.velX = player.facingRight ? (force * boost) : -(force * boost);
+                    
+                        // Transition to Attack State
+                        player.animTimer = 0; 
+                        player.frameIndex = 0;
+                        player.state = 'ATTACK_FWD';
+                        player.hitEnemies = [];
+                        player.lastChargeMult = mult;
+                    
+                        // --- INVULNERABILITY FIX ---
+                        // Calculate animation length: frames * speed
+                        const animLen = (sprites.ATTACK_FWD?.frames || 6) * (sprites.ATTACK_FWD?.speed || 4);
+                        player.invulnTimer = animLen; // Invulnerable for duration of attack
+                    
+                        // Execute Hitbox Logic
+                        runCombatLogic('CHARGE_RELEASE');
+                        player.charge = 0;
+                    }
+            } else if (player.state !== 'CONSUME') {
+                if (player.isWallSliding) player.state = 'WALL_SLIDE';
+                else if (!player.isGrounded) player.state = (player.velY < 0) ? 'JUMP' : 'FALL';
+                else if (isBlocking) player.state = 'BLOCK';
+                else player.state = Math.abs(player.velX) > 0.1
+                    ? (player.isRunning ? 'RUN' : 'WALK')
+                    : 'IDLE';
+            }
+
+            camY += (player.y - VIEW_HEIGHT / 2 - camY) * config.camLerp;
+            camY = Math.max(0, Math.min(camY, WORLD_HEIGHT - VIEW_HEIGHT));
+
+            // --- REPLACEMENT BLOCK START ---
+            // Iterate backwards so we can safely remove enemies (killEnemy) while looping
+            for (let i = enemies.length - 1; i >= 0; i--) {
+                const e = enemies[i];
+
+                // 1. IS BEING CONSUMED? (Suction Physics)
+                if (e.beingConsumed) {
+                    // Move enemy center towards player center
+                    const targetX = player.x + (config.hitboxW / 2) - (e.w / 2);
+                    const targetY = player.y + (config.hitboxH / 2) - (e.h / 2);
+                    
+                    // Lerp (0.15 = 15% of the distance per frame)
+                    e.x += (targetX - e.x) * 0.15;
+                    e.y += (targetY - e.y) * 0.15;
+
+                    // Finish Consume when close enough
+                    if (Math.abs(e.x - targetX) < 4 && Math.abs(e.y - targetY) < 4) {
+                        player.hp = Math.min(100, player.hp + 20); 
+                        killEnemy(i); // This is safe now because of the reverse loop
+                        showNotif("CONSUMED!");
+                    }
+                } 
+                // 2. NORMAL BEHAVIOR (Patrol & Knockback)
+                else {
+                    // --- A. KNOCKBACK COLLISION ---
+                    if(e.kbX !== 0) { 
+                        const nextX = e.x + e.kbX;
+                        // Check the "Leading Edge" (Right side if flying right, Left if left)
+                        const checkSide = e.kbX > 0 ? nextX + e.w : nextX;
+
+                        if (isPointSolid(checkSide, e.y + e.h / 2)) {
+                             e.kbX = 0; // Splat! Stop momentum immediately if hitting a wall.
+                        } else {
+                             e.x += e.kbX; // Space is clear, apply movement.
+                        }
+
+                        e.kbX *= 0.85; // Friction
+                        if(Math.abs(e.kbX) < 0.1) e.kbX = 0; 
+                    } 
+                    
+                    // --- B. PATROL COLLISION (Filled in) ---
+                    if (e.kbX === 0) {
+                          const spd = (config.enemyPatrolSpeed || 0.5);
+                          const nextX = e.x + (spd * e.dir);
+
+                          // Check the "Leading Edge" for patrol
+                          const checkX = e.dir === 1 ? nextX + e.w : nextX;
+                          
+                          if (isPointSolid(checkX, e.y + e.h / 2)) {
+                               e.dir *= -1; // Hit wall? Turn around!
+                          } 
+                          else {
+                               e.x = nextX;
+                               // Keep range check for open areas
+                               if (e.x > e.startX + e.range) e.dir = -1;
+                               if (e.x < e.startX - e.range) e.dir = 1;
+                          }
+                    }
+                } // <--- You were missing this bracket!
+
+                // 3. ANIMATION (Outside the else block so it runs during consume too, if desired)
+                const s = sprites['ENEMY_IDLE']; 
+                if (s) {
+                    e.animTimer++;
+                    if (e.animTimer >= s.speed) {
+                        e.frameIndex++;
+                        if (e.frameIndex >= s.frames) e.frameIndex = 0;
+                        e.animTimer = 0;
+                    }
+                }
+            }
+            // --- REPLACEMENT BLOCK END ---
+            const now = Date.now();
+            for (let i = deadEnemies.length - 1; i >= 0; i--) {
+                if (now > deadEnemies[i].respawnTime) { enemies.push({ ...deadEnemies[i], hp: deadEnemies[i].maxHp, beingConsumed: false, kbX: 0}); deadEnemies.splice(i, 1); }
+            }
+
+            input.jumpPressed = false;
+            document.getElementById('debug-state').innerText = player.state;
+            
+            // Frame Advance with Jump Loop Fix
+            if (lock || (s && s.img)) {
+                // ADDED: Prevent Jump Loop
+                const loop = !['CONSUME', 'LAND', 'ATTACK_FWD', 'ATTACK_UP', 'ATTACK_DOWN', 'JUMP'].includes(player.state);
+                
+                if (player.animTimer >= sp) { 
+                    if (loop) player.frameIndex = (player.frameIndex + 1) % fr; 
+                    else if (player.frameIndex < fr - 1) player.frameIndex++;
+                    player.animTimer = 0;
+                }
+            }
+            
+             // Debug Run
+            const runEl = document.getElementById('debug-run');
+            if(player.isRunning) { runEl.innerText="RUN"; runEl.className="text-emerald-400 font-bold"; }
+            else { runEl.innerText="WALK"; runEl.className="text-slate-500 font-bold"; }
+        }
+
+        // --- 5.19 COMBAT ---
+        function runCombatLogic(type) {
+            let hitW = 30; let hitH = config.hitboxH; 
+            let offX = player.facingRight ? player.x + config.hitboxW : player.x - 30;
+            let offY = player.y;
+            let multiplier = 1.0;
+
+            if (type === 'CHARGE_RELEASE') multiplier = player.lastChargeMult || 1.0;
+
+            if(player.state === 'ATTACK_UP') { hitW = 20; hitH = 40; offY -= 20; offX = player.x; }
+            if(player.state === 'ATTACK_DOWN') { hitW = 20; hitH = 40; offY += 20; offX = player.x; }
+
+            const hitRect = { x: offX, y: offY, w: hitW, h: hitH };
+            player.debugHitbox = hitRect; player.debugHitTimer = 2; 
+
+            for (let i = enemies.length - 1; i >= 0; i--) {
+                const e = enemies[i];
+                if (!player.hitEnemies.includes(e.id) && !e.beingConsumed && intersect(hitRect, e)) {
+                    player.hitEnemies.push(e.id);
+                    e.hp -= 20 * multiplier;
+                    let kDir = player.facingRight ? 1 : -1;
+                    if (player.state === 'ATTACK_UP' || player.state === 'ATTACK_DOWN') kDir = 0; 
+                    e.kbX = kDir * (config.knockback || 7) * multiplier;
+                    showNotif(`HIT! x${multiplier.toFixed(1)}`);
+                    if (player.state === 'ATTACK_DOWN') { player.velY = -6; player.state = 'JUMP'; } // Pogo
+                    if (e.hp <= 0) killEnemy(i);
+                }
+            }
+        }
+        
+        function checkConsume() {
+            // FIX: Align hitbox with the "mouth" (outer 16px of the sprite)
+            // Render offset is -9. Sprite width is 32.
+            // Right: Starts at x+7, Width 16
+            // Left: Starts at x-9, Width 16
+            const offX = player.facingRight ? 7 : -9;
+            
+            const hitRect = { 
+                x: player.x + offX, 
+                y: player.y, 
+                w: 16, 
+                h: config.hitboxH 
+            };
+            
+            // Debug the new hitbox so you can see it (Optional)
+            player.debugHitbox = hitRect; player.debugHitTimer = 10;
+
+            for (let i = enemies.length - 1; i >= 0; i--) {
+                const e = enemies[i];
+                if (intersect(hitRect, e)) {
+                    if (e.hp / e.maxHp <= (config.woundThreshold || 0.33)) { 
+                        player.hp = Math.min(100, player.hp + 20); 
+                        e.beingConsumed = true;
+                        showNotif("CONSUMED!"); 
+                    } else { 
+                        e.hp -= 15; 
+                        e.kbX = player.facingRight ? 7 : -7; 
+                        showNotif("POP!"); 
+                    }
+                }
+            }
+        }
+
+        // --- 5.19 COLLISION & DRAW ---
+        function checkWall(dir) {
+            const checkX = dir === 'left' ? player.x - 2 : player.x + config.hitboxW + 2;
+            return isPointSolid(checkX, player.y) || isPointSolid(checkX, player.y + config.hitboxH/2) || isPointSolid(checkX, player.y + config.hitboxH - 2);
+        }
+        function isPointSolid(x, y) { for (let t of tiles) { if (x >= t.x && x <= t.x + t.w && y >= t.y && y <= t.y + t.h) return true; } return false; }
+        function isPointOverFloor(x, y) { for (let t of tiles) { if (x >= t.x && x <= t.x + t.w && y >= t.y && y <= t.y + t.h + 2) return true; } return false; }
+        function checkCol(axis) {
+            if (axis === 'y') player.isGrounded = false;
+            for (let t of tiles) {
+                if (player.x < t.x + t.w && player.x + config.hitboxW > t.x && player.y < t.y + t.h && player.y + config.hitboxH > t.y) {
+                    if (axis === 'x') { if (player.velX > 0) player.x = t.x - config.hitboxW; else player.x = t.x + t.w; player.velX = 0; }
+                    else { if (player.velY > 0) { player.y = t.y - config.hitboxH; player.isGrounded = true; } else player.y = t.y + t.h; player.velY = 0; }
+                }
+            }
+        }
+        function intersect(r1, r2) { return !(r2.x > r1.x + r1.w || r2.x + r2.w < r1.x || r2.y > r1.y + r1.h || r2.y + r2.h < r1.y); }
+        function killEnemy(idx) { const e = enemies[idx]; deadEnemies.push({ ...e, respawnTime: Date.now() + 3000 }); enemies.splice(idx, 1); }
+
+        function render() {
+            ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, GAME_WIDTH, VIEW_HEIGHT);
+            const cy = config.camSnap ? Math.floor(camY) : camY;
+            ctx.save(); ctx.translate(0, -cy);
+            ctx.fillStyle = '#1e293b'; for (let t of tiles) ctx.fillRect(Math.round(t.x), Math.round(t.y), Math.round(t.w), Math.round(t.h));
+            
+            enemies.forEach(e => {
+                const s = sprites['ENEMY_IDLE'];
+                const wound = (e.hp/e.maxHp) <= config.woundThreshold;
+                if (s && s.img) {
+                    ctx.save();
+                    if (wound) ctx.filter = 'brightness(0.6) sepia(1) hue-rotate(-50deg)';
+                    if (e.dir === -1) { ctx.translate(Math.round(e.x) + 32 - 9, Math.round(e.y) - 6); ctx.scale(-1, 1); ctx.drawImage(s.img, e.frameIndex*32, 0, 32, 32, 0, 0, 32, 32); } 
+                    else { ctx.drawImage(s.img, e.frameIndex*32, 0, 32, 32, Math.round(e.x)-9, Math.round(e.y)-6, 32, 32); }
+                    ctx.restore();
+                } else {
+                    ctx.fillStyle = wound ? '#e11d48' : '#475569'; ctx.fillRect(Math.round(e.x), Math.round(e.y), e.w, e.h);
+                }
+            });
+
+            const s = sprites[player.state];
+            if (s && s.img) {
+                ctx.save();
+                let dx = Math.round(player.x) - 9; 
+                let dy = Math.round(player.y) - 8;
+                // --- INSERT FIX HERE: Clamp sprite to screen bounds ---
+                // This pushes the sprite visual out of the wall without moving the hitbox
+                dx = Math.max(0, Math.min(GAME_WIDTH - 32, dx));
+                // ----------------------------------------------------
+                 if (player.state === 'CHARGING') {
+                    // Smooth brightness transition based on charge count
+                    // Max brightness at 60 frames (1 second)
+                    const brightness = 1 + Math.min(player.charge / 60, 2); 
+                    ctx.filter = `brightness(${brightness}) sepia(1) hue-rotate(-50deg)`;
+                }
+                
+                // --- 5.27 BLINK FIX ---
+                let fIdx = player.frameIndex;
+                if (fIdx >= s.frames) fIdx = 0; // Force loop if frame count mismatch
+
+                if (!player.facingRight) { ctx.translate(dx + 32, dy); ctx.scale(-1, 1); ctx.drawImage(s.img, fIdx*32, 0, 32, 32, 0, 0, 32, 32); } 
+                else { ctx.drawImage(s.img, fIdx*32, 0, 32, 32, dx, dy, 32, 32); }
+                ctx.restore();
+            } else {
+                ctx.fillStyle = '#6366f1';
+                if(player.state === 'CHARGING') {
+                    if (player.charge > config.chargeTime2) ctx.fillStyle = '#ef4444';
+                    else if (player.charge > config.chargeTime1) ctx.fillStyle = '#f59e0b';
+                    else ctx.fillStyle = '#fff';
+                }
+                ctx.fillRect(Math.round(player.x), Math.round(player.y), config.hitboxW, config.hitboxH);
+            }
+            if (player.debugHitTimer > 0) { player.debugHitTimer--; ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 1; ctx.strokeRect(player.debugHitbox.x, player.debugHitbox.y, player.debugHitbox.w, player.debugHitbox.h); }
+            ctx.restore();
+            document.getElementById('player-hp-bar').style.width = (player.hp/player.maxHp)*100 + "%";
+            document.getElementById('player-hp-text').innerText = Math.round(player.hp);
+        }
+
+        // --- INPUTS ---
+        let gpActive = false;
+        const prevGP = new Set();
+    // --- UPDATED POLLGP FUNCTION ---
+        function pollGP() {
+            const gp = navigator.getGamepads()[0];
+            if (!gp) return;
+            gpActive = true;
+            const x = gp.axes[0]; const y = gp.axes[1];
+            
+            // 5.19 logic: threshold > 0.9 = run
+            if (Math.abs(x) > 0.9) player.isRunning = true;
+            
+            input.left = x < -0.3 || gp.buttons[14].pressed;
+            input.right = x > 0.3 || gp.buttons[15].pressed;
+            input.up = y < -0.3 || gp.buttons[12].pressed;
+            input.down = y > 0.3 || gp.buttons[13].pressed;
+            
+            // 1. Reset Continuous States (So multiple buttons can contribute)
+            input.gpBlock = false;
+            input.gpAttack = false;
+
+            const check = (idx, action) => {
+                // Safety check for buttons (some gamepads have fewer buttons)
+                if (!gp.buttons[idx]) return; 
+
+                const p = gp.buttons[idx].pressed;
+                
+                // Rising Edge (Event Triggers)
+                if (p && !prevGP.has(idx)) {
+                    if (action === 'jump') input.jumpPressed = true;
+                    if (action === 'attack') input.attackPressed = true;
+                    if (action === 'consume') input.consumePressed = true;
+                    if (action === 'reset') resetPlayer();
+                }
+                
+                // Falling Edge
+                if (!p && prevGP.has(idx)) { 
+                    if (action === 'jump') input.jumpReleased = true; 
+                }
+                
+                // Continuous State (OR Logic)
+                if (action === 'jump' && p) input.jump = true;
+                if (action === 'attack' && p) input.gpAttack = true;
+                if (action === 'block' && p) input.gpBlock = true;
+
+                if (p) prevGP.add(idx); else prevGP.delete(idx);
+            };
+
+            // --- MAPPINGS ---
+            check(1, 'jump');       // B / Circle
+            check(0, 'attack');     // A / Cross
+            check(9, 'reset');      // Start / Menu
+
+            // Consume: Y (3) | RB (5) | RT (7)
+            check(3, 'consume'); check(5, 'consume'); check(7, 'consume');
+
+            // Block: X (2) | LB (4) | LT (6)
+            check(2, 'block'); check(4, 'block'); check(6, 'block');
+
+            // D-Pad Double Taps
+            const now = Date.now();
+            if (gp.buttons[14].pressed && !prevGP.has(14)) {
+                if (now - input.lastLeft < 300) player.isRunning = true;
+                input.lastLeft = now;
+            }
+            if (gp.buttons[15].pressed && !prevGP.has(15)) {
+                if (now - input.lastRight < 300) player.isRunning = true;
+                input.lastRight = now;
+            }
+            [14, 15].forEach(i => { if(gp.buttons[i].pressed) prevGP.add(i); else prevGP.delete(i); });
+        }
+
+        window.addEventListener('keydown', e => {
+            const k = e.key.toLowerCase();
+            const now = Date.now();
+            if(k==='arrowleft') { if(!input.left && (now - input.lastLeft < 300)) player.isRunning = true; input.lastLeft = now; input.left=true; }
+            if(k==='arrowright') { if(!input.right && (now - input.lastRight < 300)) player.isRunning = true; input.lastRight = now; input.right=true; }
+            if(k==='arrowup') input.up=true; if(k==='arrowdown') input.down=true;
+            if(k==='z') { if(!input.jump) input.jumpPressed=true; input.jump=true; }
+            if(k==='x') { input.attack = true; input.attackPressed = true; }
+            if(k==='v') input.consumePressed = true;
+            if(k==='c') input.keyBlock = true; // KEY BLOCK
+        });
+            window.addEventListener('keyup', e => {
+                const k = e.key.toLowerCase();
+            
+                // UPDATED LOGIC: Just clear the input, don't touch isRunning
+                if(k==='arrowleft') { input.left=false; } 
+                if(k==='arrowright') { input.right=false; }
+            
+                if(k==='arrowup') input.up=false; if(k==='arrowdown') input.down=false;
+                if(k==='z') { input.jump=false; input.jumpReleased=true; }
+                if(k==='x') input.attack=false;
+                if(k==='c') input.keyBlock = false; 
+            });
+
+        window.resetPlayer = () => { player.x = 100; player.y = 926; player.velX = 0; player.velY = 0; player.hp=100; camY = 800; showNotif("Reset"); };
+        window.respawnAllEnemies = () => { 
+            enemies = [ 
+                { id: 1, x: 60, y: 926, w: 14, h: 24, hp: 100, maxHp: 100, animTimer: 0, frameIndex: 0, kbX: 0, startX: 60, dir: 1, range: 40, beingConsumed: false }, 
+                { id: 2, x: 180, y: 926, w: 14, h: 24, hp: 30, maxHp: 100, animTimer: 0, frameIndex: 0, kbX: 0, startX: 180, dir: -1, range: 40, beingConsumed: false } 
+            ]; 
+            deadEnemies = []; 
+            showNotif("Respawned"); 
+        };
+        window.showNotif = m => { const n=document.getElementById('notification'); n.innerText=m; n.style.opacity=1; setTimeout(()=>n.style.opacity=0, 1500); };
+        
+        // PERSISTENCE
+        function saveCurrentToLocal() { localStorage.setItem('gba_lab_v534', JSON.stringify(config)); }
+        window.exportToFile = () => { const b = new Blob([JSON.stringify(config)],{type:'application/json'}); const u = URL.createObjectURL(b); const a=document.createElement('a'); a.href=u; a.download='gba_v534.json'; a.click(); };
+        window.factoryReset = () => { if(confirm("Reset?")) { localStorage.clear(); location.reload(); } };
+        document.getElementById('import-file').onchange = e => { const f = e.target.files[0]; if(!f)return; const r = new FileReader(); r.onload=ev=>{ try{ config=JSON.parse(ev.target.result); applyConfig(); }catch(e){alert("Error");} }; r.readAsText(f); };
+        
+        function applyConfig() {
+            tunables.forEach(t => {
+                const n = document.getElementById(`num-${t.key}`);
+                const r = document.getElementById(`rng-${t.key}`);
+                if(n) n.value = config[t.key];
+                if(r) r.value = config[t.key];
+            });
+            Object.keys(sprites).forEach(k => {
+                if(config.savedSprites[k]) loadSpriteFromData(k, config.savedSprites[k]);
+                if(config.savedFrames[k]) document.getElementById(`f-${k}`).value = config.savedFrames[k];
+                if(config.savedSpeeds[k]) document.getElementById(`s-${k}`).value = config.savedSpeeds[k];
+            });
+        }
+        
+        const loadKeys = ['gba_lab_v534', 'gba_lab_v527', 'gba_lab_current_config'];
+        for (let key of loadKeys) {
+            const data = localStorage.getItem(key);
+            if (data) {
+                try {
+                    const parsed = JSON.parse(data);
+                    if (key === 'gba_lab_current_config') {
+                         const scale = 0.6; // 0.6x Scale for 240p
+                         const scaleKeys = ['walkAccel', 'walkMax', 'runAccel', 'runMax', 'jumpForce', 'maxFall', 'wallKickX', 'wallKickY', 'atkLunge', 'chargeLunge', 'knockback', 'gravity'];
+                         scaleKeys.forEach(k => { if(parsed[k] !== undefined) parsed[k] = parseFloat((parsed[k]*scale).toFixed(3)); });
+                         showNotif("Legacy Data Scaled");
+                    }
+                    config = {...DEFAULT_CONFIG, ...parsed};
+                    applyConfig();
+                    break;
+                } catch(e) { console.error("Load Err", e); }
+            }
+        }
+        
+        requestAnimationFrame(gameLoop);
+    </script>
+</body>
+</html>

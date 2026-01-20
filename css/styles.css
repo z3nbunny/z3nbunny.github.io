@@ -21,21 +21,28 @@ Refactored: 1/19/2026
     --color-border-medium: #ccc;
     --color-primary-blue: #007BFF;
     --color-primary-blue-dark: #0056b3;
+    --color-primary-pink: #d81b60; /* Added for consistency */
     --color-dark-gray: #444;
     --color-dark-gray-hover: #555;
     
     /* Type Scale (Desktop Default) */
-    --text-base: 1rem;       /* 16px */
-    --text-sm: 1vw;          /* ~14-16px depending on screen */
+    --text-base: 1rem;        /* 16px (Standard) */
+    --text-sm: 0.875rem;      /* 14px (For footers/captions) */
     --text-lg: 1.125rem;     /* Fixed readability size */
-    --text-p1: 2vw;          /* Scalable body text */
-    --text-h3: 2vw;
-    --text-h2: 2.5vw;
-    --text-h1: 4vw;
+
+    --text-bio: 1.5rem;       /* 24px (Large, readable intro) */
+    --text-body: 1.125rem;    /* 18px (Perfect accessible reading size) */
+
+    /* Headings */
+    --text-h4: 1.5rem;        /* 24px */
+    --text-h3: 1.75rem;       /* 28px */
+    --text-h2: 2.5rem;        /* 40px */
+    --text-h1: 3.5rem;        /* 56px */
 
     /* Mobile Type Scale Overrides */
     --text-h2-mobile: 5vw;
     --text-h1-mobile: 7vw;
+    --color-accent-green: #33a054; /* A rich, warm forest green */
 }
 
 /* =========================================
@@ -66,9 +73,9 @@ h4 { font-weight: 600; font-size: var(--text-h3); text-align: center; }
 p {
     font-family: var(--font-body);
     font-weight: 400;
-    font-size: var(--text-p1);
-    line-height: 1.6;
-    margin: 0;
+    font-size: var(--text-body); /* Uses the new 1.125rem size */
+    line-height: 1.7;            /* generous spacing makes reading easier */
+    margin-bottom: 1em;          /* Adds breathing room between paragraphs */
 }
 
 a { color: var(--color-text-primary); text-decoration: none; }
@@ -217,84 +224,162 @@ img.logo:hover { filter: drop-shadow(0 0 5px rgba(0,0,0,0.4)); }
 
 .about_text { flex: 1; }
 
-.bio { font-size: var(--text-lg); }
+.bio {
+    font-size: var(--text-bio); /* Uses the new 1.5rem size */
+    font-weight: 300;           /* Make it slightly lighter so it doesn't look clunky */
+    line-height: 1.5;
+    color: #333;
+}
 
 /* --- Work / Case Studies Container --- */
-.my_work_section { margin: 10vh 0; }
+.my_work_section { 
+    margin-top: 4em;    /* Was 10vh (too big). Reduced to ~64px */
+    margin-bottom: 2em; 
+}
 
 .my_work_section_header {
     width: 100%;
-    height: 10vw;
+    /* Removed fixed height so it adapts to content */
     display: flex;
     justify-content: center;
     align-items: center;
-}
-
-.my_work_title {
-    padding: 2vw;
-    text-align: center;
-    font-weight: 300;
-    font-size: 4vw;
+    margin-bottom: 3em; /* ADDED: Pushes the first banner away from the title */
 }
 
 /* =========================================
-   6. ACCORDION SYSTEM (The Core Logic)
+   6. ACCORDION SYSTEM (Refined Spacing)
    ========================================= */
+
 .case-study-container {
     max-width: 900px;
-    margin: 3em auto;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    overflow: hidden;
+    margin: 0 auto;
+    /* REMOVED: border, border-radius, overflow */
+    /* We removed the outer box so items can float freely */
 }
 
-.case-study-item { border-bottom: 1px solid #ddd; }
-.case-study-item:last-child { border-bottom: none; }
+.case-study-item {
+    width: 90%;
+    margin: 0 auto 2.5em auto; /* ADDED: The "Breathing Room" between banners */
+    /* ADDED: Card styling for individual items */
+    border: 1px solid #ddd;
+    border-radius: 12px; 
+    overflow: hidden; /* Ensures content respects the rounded corners */
+    box-shadow: 0 4px 6px rgba(0,0,0,0.02); /* Subtle depth */
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+}
 
-/* The Trigger Bar */
+/* Optional: Slight lift on hover */
+.case-study-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.05);
+}
+
+/* --- THE "BAT CITY STYLE" UNIVERSAL TRIGGER --- */
 .case-study-trigger {
+    /* 1. BIG BANNER LAYOUT */
     display: flex;
+    align-items: center;
+    justify-content: center; /* Center the logo/text group */
     width: 100%;
-    padding: 2em;
+    min-height: 200px; /* Restored the original height */
+    position: relative; /* Needed for the absolute caret */
+    
+    padding: 2em; 
+    margin: 0;
     border: none;
     cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: left;
+    
+    /* Default Background (Overridden by specific IDs) */
     background-color: #f9f9f9;
-    color: var(--color-text-primary);
-    transition: background-color 0.2s ease;
 }
 
-.case-study-trigger:hover { background-color: #f1f1f1; }
+/* Wrapper for the Icon + Text group */
+.case-study-trigger-content {
+    display: flex;
+    align-items: center;
+    gap: 3vw; /* Restored the responsive gap */
+    max-width: 80%;
+}
 
-/* The Caret Icon */
+/* 2. RESTORED LOGO SCALING */
+.case-study-logo {
+    width: 12vw;      /* Restored variable width */
+    max-width: 100px;  /* Cap it so it doesn't get huge on massive screens */
+    height: auto;
+    object-fit: contain;
+}
+
+/* 3. RESTORED TEXT SCALING */
+.case-study-trigger-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.case-study-title {
+    font-family: var(--font-heading);
+    font-size: 3.5vw; /* Restored responsive font size */
+    line-height: 1.1;
+    margin: 0;
+}
+
+/* Cap font size on huge screens */
+@media (min-width: 1200px) {
+    .case-study-title { font-size: 2.5rem; }
+}
+
+.case-study-subtitle {
+    font-family: var(--font-body);
+    font-size: 1.5vw; /* Restored responsive subtitle */
+    margin-top: 0.5em;
+    opacity: 0.9;
+}
+@media (min-width: 1200px) {
+    .case-study-subtitle { font-size: 1rem; }
+}
+
+/* 4. RESTORED ABSOLUTE CARET */
 .case-study-caret {
-    width: 0.8em;
-    height: 0.8em;
-    border-bottom: 3px solid var(--color-text-primary);
-    border-right: 3px solid var(--color-text-primary);
-    transform: rotate(45deg);
-    transition: transform 0.4s ease;
-    margin-top: 0.5em; 
+    position: absolute;
+    right: 4vw; /* Pinned to the right */
+    top: 50%;
+    width: 12px;
+    height: 12px;
+    border-bottom: 3px solid currentColor; /* Inherits text color */
+    border-right: 3px solid currentColor;
+    transform: translateY(-50%) rotate(45deg); /* Default Down-Right angle */
+    transition: transform 0.3s ease;
+}
+
+/* Rotation when open */
+.case-study-trigger[aria-expanded="true"] .case-study-caret {
+    transform: translateY(-50%) rotate(-135deg); /* Flip up */
 }
 
 /* Animation Logic */
 .case-study-content {
-    display: grid;
-    grid-template-rows: 0fr; /* Closed state */
-    transition: grid-template-rows 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .case-study-trigger[aria-expanded="true"] + .case-study-content {
-    grid-template-rows: 1fr; /* Open state */
+    max-height: 3000px; /* safely larger than any case study */
 }
 
-.case-study-content-inner { overflow: hidden; background: #fff; }
+.case-study-content-inner {
+    background: #fff; 
+    padding-bottom: 3em;
+    min-height: 0;
+}
 
 /* Content Layout (Zig-Zag) */
 .case-study-feature {
     display: flex;
     align-items: center;
     gap: 2em;
-    margin-bottom: 3em;
     padding: 1.5em 2em;
 }
 
@@ -308,99 +393,151 @@ img.logo:hover { filter: drop-shadow(0 0 5px rgba(0,0,0,0.4)); }
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
-/* List Styles inside Case Studies */
-.case-study-text ul { list-style: none; padding: 0; margin: 1.5em 0; }
+/* List Styles */
+.case-study-text ul {
+    list-style: none; padding: 0; margin: 1.5em 0; 
+}
 
 .case-study-text li {
-    position: relative;
-    padding-left: 1em;
-    margin-bottom: 1.2em;
-    font-size: var(--text-base);
+    font-size: var(--text-body); /* Same size as paragraphs */
+    line-height: 1.7;
+    margin-bottom: 0.5em;
+    color: #444;                 /* Slightly softer black for readability */
 }
 
 .case-study-text li strong {
-    font-family: var(--font-heading);
-    font-weight: 600;
-    color: black;
-    display: block;
-    margin-bottom: 0.2em;
+    font-weight: 600; color: black; display: block; margin-bottom: 0.2em;
 }
+
+.case-study-text h4 {
+    font-size: var(--text-h4);
+    text-align: left;
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+    color: black;
+}
+
 
 /* =========================================
    7. PROJECT SPECIFIC STYLES
    ========================================= */
 
-/* --- Project 1: Bat City Bites --- */
+/* --- Project 1: Bat City Bites (Image Background) --- */
 #bat-city-bites-trigger {
-    background-image: linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0)), url('../images/Congress-Ave-Bridge-Bats-sunsetAmanda-Stronza-1407x938.jpg');
-    background-size: 150% auto; /* Middle-third crop */
-    background-position: center center;
-    background-repeat: no-repeat;
-    min-height: 200px;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    background-image: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.2)), url('../images/Congress-Ave-Bridge-Bats-sunsetAmanda-Stronza.png');
+    background-size: cover;
+    background-position: bottom;
+    color: white;
+}
+/* White Caret for dark image */
+#bat-city-bites-trigger .case-study-caret { border-color: white; }
+
+
+/* --- Project 2: Solry Up & Up --- */
+#browser-game-trigger {
+    /* 1. BACKUP COLOR (Keeps the original soft pink if image fails) */
+    background-color: #fce4ec; 
+    
+    /* 2. THE IMAGE with Darkening Overlay */
+    /* Adjust rgba(0,0,0,0.4) if you need it darker/lighter for readability */
+    background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('../images/solry_background.png');
+    background-size: cover;
+    background-position: center;
+    
+    /* 3. TEXT COLORS (Switch to white for contrast) */
     color: white;
 }
 
-#bat-city-bites-trigger .case-study-trigger-content {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 3vw;
-    width: auto;
+/* Force specific text elements to White */
+#browser-game-trigger .case-study-subtitle {
+    color: #ffd1dc; /* Light pink (instead of dark pink) for subtitle contrast */
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
 }
 
-#bat-city-bites-trigger .case-study-logo { width: 12vw; margin: 0; }
-#bat-city-bites-trigger .case-study-title { font-size: 4vw; line-height: 1.1; margin: 0; text-align: left; }
-#bat-city-bites-trigger .case-study-subtitle { font-size: 2vw; margin-top: 0.2vw; color: white; opacity: 0.9; }
+#browser-game-trigger .case-study-title {
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
 
-#bat-city-bites-trigger .case-study-caret {
-    position: absolute;
-    right: 4vw;
-    top: 50%;
-    margin: 0;
+.game-demo-section {
+    width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+    padding: 0 2em 3em 2em;
+}
+
+/* White Caret */
+#browser-game-trigger .case-study-caret { border-color: white; }
+
+/* Dark Caret for light background */
+#browser-game-trigger .case-study-caret { border-color: #3e2723; }
+
+
+/* --- Project 3: HACA / KANO (The Education Banner) --- */
+#haca-trigger {
+    background-color: #6a1b9a; 
+    background-image: url('../images/kano_course_background.png');
+    background-size: cover;
+    background-position: center;
+    color: white;
+}
+
+#haca-trigger:hover {
+    /* Lighten the overlay slightly on hover for a "glow" effect */
+    background-image: url('../images/Kano_course_background.png');
+}
+
+/* White Caret for dark background */
+#haca-trigger .case-study-caret { border-color: white; }
+
+/* --- Project 4: Peoples Rx (Local Wellness) --- */
+#peoples-rx-trigger {
+    background: #ffffff;
+    border: 1px solid #e0e0e0; /* Light border defines it against page white */
+    color: #0d47a1; /* Deep Navy Blue text color (for the backup text) */
+}
+
+/* Hover State */
+#peoples-rx-trigger:hover {
+    background: #f8f9fa; /* Very subtle grey on hover */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* Make the logo bigger since it stands alone now */
+#peoples-rx-trigger .case-study-logo {
+    width: 30vw;        /* Increased from standard 12vw */
+    max-width: 300px;   /* Cap formatting for large screens */
+}
+
+/* Dark Caret */
+#peoples-rx-trigger .case-study-caret {
+    border-color: #0d47a1;
+}
+
+/* --- Project 5: Crop Crusaders (Harvest Strategy) --- */
+#crop-crusaders-trigger {
+    /* A rich Harvest Gold gradient */
+    background: linear-gradient(135deg, #f9c747 0%, #984d91 100%);
+    color: white;
+    background-image: url('../images/crop_crusaders_background.jpg');
+    background-size: cover;
+    background-position: center;
+}
+
+#crop-crusaders-trigger .case-study-title,
+#crop-crusaders-trigger .case-study-subtitle {
+    color: white;
+    text-shadow: 0px 1px 2px rgba(0,0,0,0.8);
+}
+
+/* White Caret */
+#crop-crusaders-trigger .case-study-caret {
     border-color: white;
-    transform: translateY(-50%) rotate(45deg);
-}
-#bat-city-bites-trigger[aria-expanded="true"] .case-study-caret {
-    transform: translateY(-50%) rotate(-135deg);
 }
 
-/* --- Project 2: Browser Platformer --- */
-#browser-game-trigger {
-    background: linear-gradient(135deg, #fff5f5 0%, #fce4ec 100%); /* Soft Pop */
-    position: relative;
-    min-height: 200px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-#browser-game-trigger .case-study-trigger-content {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 3vw;
-}
-
-#browser-game-trigger .case-study-title { color: #3e2723; font-size: 3.5vw; line-height: 1.1; margin: 0; }
-#browser-game-trigger .case-study-subtitle { color: #d81b60; font-family: 'Courier New', monospace; font-weight: bold; font-size: 1.4vw; margin-top: 0.5em; letter-spacing: 1px; }
-
-#browser-game-trigger .case-study-caret {
-    position: absolute;
-    right: 4vw;
-    top: 50%;
-    margin: 0;
-    border-color: #3e2723;
-    transform: translateY(-50%) rotate(45deg);
-}
-#browser-game-trigger[aria-expanded="true"] .case-study-caret {
-    transform: translateY(-50%) rotate(-135deg);
-}
-
-/* Game Canvas & Overlay */
+/* --- Game Canvas & Overlay --- */
 #game-stage-container {
     position: relative;
     width: 100%;
@@ -440,7 +577,7 @@ canvas#gameCanvas { display: block; width: 100%; height: auto; }
 }
 #start-engine-btn:hover { transform: scale(1.05); background: #ad1457; }
 
-/* Mobile Game Controls */
+/* Mobile Game Controls (Hidden in Index) */
 #mobile-controls {
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
@@ -448,25 +585,6 @@ canvas#gameCanvas { display: block; width: 100%; height: auto; }
     z-index: 20;
 }
 #mobile-controls.hidden { display: none; }
-
-.touch-btn {
-    position: absolute;
-    pointer-events: auto;
-    background: rgba(255, 255, 255, 0.3);
-    border: 2px solid rgba(255, 255, 255, 0.6);
-    color: white;
-    border-radius: 50%;
-    width: 60px;
-    height: 60px;
-    font-size: 1.5rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    user-select: none;
-}
-#btn-left { bottom: 30px; left: 20px; }
-#btn-right { bottom: 30px; left: 100px; }
-#btn-jump { bottom: 30px; right: 30px; background: rgba(216, 27, 96, 0.4); border-color: #d81b60; }
 
 #btn-fullscreen-enter {
     position: absolute;
@@ -483,7 +601,223 @@ canvas#gameCanvas { display: block; width: 100%; height: auto; }
 }
 
 /* =========================================
-   8. FOOTER
+   GAME CONTROLS TABLE
+   ========================================= */
+.controls-container {
+    max-width: 600px;
+    margin: 2em auto 0 auto;
+    text-align: left;
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 1.5em;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.controls-container h5 {
+    font-family: var(--font-heading);
+    font-size: 1.1rem;
+    color: #444;
+    margin-bottom: 1em;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 0.5em;
+}
+
+.controls-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8em;
+}
+
+.control-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    font-size: 0.9rem;
+    align-items: center;
+}
+
+.control-row.header {
+    font-weight: 700;
+    color: #888;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    margin-bottom: 0.5em;
+}
+
+.key-badge {
+    display: inline-block;
+    background: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-family: monospace;
+    font-weight: bold;
+    color: #333;
+    font-size: 0.85rem;
+    box-shadow: 0 2px 0 #ccc;
+}
+
+/* =========================================
+   8. TOOLKIT & CTA SECTIONS
+   ========================================= */
+
+.toolkit_section {
+    padding: 4em 2em 6em 2em;
+    background-color: var(--color-background-light); 
+    text-align: center;
+}
+
+.toolkit_header {
+    margin-bottom: 3em;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.toolkit_header h2 {
+    font-size: 2.5rem;
+    color: black;
+    margin-bottom: 0.5em;
+}
+
+.toolkit_header p {
+    color: var(--color-dark-gray);
+    font-size: 1.125rem;
+}
+
+.toolkit_grid {
+    display: flex;             /* Changed from Grid to Flex */
+    flex-wrap: wrap;           /* Allow items to wrap to next line */
+    justify-content: center;   /* Center items horizontally */
+    gap: 2em;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.toolkit_card {
+    box-sizing: border-box;
+    background: white;
+    padding: 2.5em;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    border: 1px solid var(--color-border-light);
+    text-align: left;
+    
+    /* Flex Sizing logic: 
+       Grow to fill space, Shrink if needed, Start at 300px wide */
+    flex: 1 1 260px; 
+    
+    /* Stop them from getting comically wide on large screens */
+    max-width: 380px; 
+}
+
+.toolkit_card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 24px rgba(56, 102, 65, 0.15); /* Subtle Green shadow */
+    border-color: var(--color-accent-green);        /* Green Border */
+}
+
+.card_icon {
+    font-size: 2rem;
+    color: var(--color-accent-green); /* Forest Green Icon */
+    margin-bottom: 1rem;
+    font-weight: bold;
+    font-family: monospace;
+}
+
+.toolkit_card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1em;
+    color: black;
+}
+
+.toolkit_card ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: block;
+}
+
+.toolkit_card li {
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 0.8em;
+    position: relative;
+    padding-left: 1.5em;
+}
+
+.toolkit_card li::before {
+    content: "•";
+    color: var(--color-accent-green); /* Forest Green Icon */
+    font-weight: bold;
+    position: absolute;
+    left: 0;
+    font-size: 1.2em;
+    line-height: 1;
+}
+
+@media (max-width: 767px) {
+    .toolkit_card {
+        /* Reduce padding so text can breathe */
+        padding: 1.5em; 
+        
+        /* Center the Headers and Icons */
+        text-align: center;
+    }
+
+    .toolkit_card ul {
+        display: inline-block; /* Makes the UL shrink to fit content */
+        text-align: left;      /* Bullets line up perfectly inside the block */
+    }
+}
+
+/* CTA Section */
+.cta_section {
+    padding: 1em 2em 6em 2em;
+    text-align: center;
+    background-color: white;
+}
+
+.cta_section h2 {
+    font-size: 2.5rem;
+    color: black;
+    margin-bottom: 0.5em;
+}
+
+.cta_section p {
+    margin-bottom: 2.5em;
+    font-size: 1.25em;
+    color: black;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.6;
+}
+
+.btn_primary {
+    display: inline-block;
+    padding: 1em 3.5em;
+    background-color: var(--color-accent-green);
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(79, 119, 45, 0.3);
+}
+
+.btn_primary:hover {
+    background-color: #248f3d; /* Slightly darker/richer on hover */
+    transform: translateY(-3px); /* Lifts up */
+    box-shadow: 0 8px 20px rgba(79, 119, 45, 0.4); /* Shadow grows */
+    text-decoration: none;
+    color: white;
+}
+
+/* =========================================
+   9. FOOTER
    ========================================= */
 footer {
     padding: 4em 0;
@@ -548,8 +882,11 @@ summary::-webkit-details-marker {
     font-size: 0.9em; 
     color: var(--color-text-primary); /* Black */
 }
+
+
+
 /* =========================================
-   9. MEDIA QUERIES
+   10. MEDIA QUERIES
    ========================================= */
 
 /* --- Tablet (768px - 991px) --- */

@@ -1,15 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>McGovern Design</title>
+    <title>David McGovern | Web Developer & UX Designer</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="./css/styles.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
 
+    <meta name="description" content="Portfolio of David McGovern, a Web Developer & UX Designer based in Austin, TX. Specializing in accessible, responsive web design and game development.">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+
 </head>
 <body>
     <header class="mcgovern_design_header">
@@ -68,7 +69,7 @@
 
             <div class="case-study-item">
     
-                <button class="case-study-trigger" id="bat-city-bites-trigger" aria-expanded="false" aria-controls="content-1">
+                <button class="case-study-trigger" id="bat-city-bites-trigger" aria-expanded="false" aria-controls="case-study-content-1">
     
                     <div class="case-study-trigger-content">
                         <img src="./images/Bat_city_bites_logo.png" alt="Bat City Bites Logo" class="case-study-logo">
@@ -138,54 +139,375 @@
             <div class="case-study-item">
     
                 <button class="case-study-trigger" id="browser-game-trigger" aria-expanded="false" aria-controls="game-content-panel">
+    
                     <div class="case-study-trigger-content">
-                        <img src="./images/game_icon_pink.png" alt="Platformer Icon" class="case-study-logo">
+                        <img src="./images/solry_icon.png" alt="Solry Game Icon" class="case-study-logo">
         
                         <div class="case-study-trigger-text">
-                            <h3 class="case-study-title">Physics Engine</h3>
-                            <p class="case-study-subtitle">Vanilla JS // Prototype</p>
+                            <h3 class="case-study-title">Solry: Up & Up</h3>
+                            <p class="case-study-subtitle">Physics Engine & Game Mechanics</p>
                         </div>
                     </div>
+    
                     <span class="case-study-caret"></span>
                 </button>
     
                 <div class="case-study-content" id="game-content-panel" role="region">
                     <div class="case-study-content-inner">
                         
-                        <div class="game-intro-text" style="padding: 2em 2em 1em 2em; text-align: center;">
-                            <p style="max-width: 600px; margin: 0 auto;">
-                                A custom-built 2D physics engine handling collision detection, velocity, and state management. 
-                                <span class="desktop-instruction"><strong>Use Arrow Keys</strong> to move & jump.</span>
-                                <span class="mobile-instruction" style="display:none;"><strong>Tap Fullscreen</strong> to play.</span>
-                            </p>
+                        <div class="case-study-feature">
+                            <div class="case-study-image">
+                                <img src="./images/Solry_physics_engine_diagram.svg" alt="Physics engine code structure" style="height:60em;width:50em;">
+                            </div>
+                            <div class="case-study-text">
+                                <h4>The Challenge: No Engines Allowed</h4>
+                                <p>
+                                    Modern tools like Unity or Godot abstract away the difficult math of game development. To truly understand the mechanics of movement, I chose to build a <strong>2D physics engine from scratch</strong> using Vanilla JavaScript.
+                                </p>
+                                <p style="margin-top: 1em;">
+                                    The goal was to replicate the "tight" feel of GBA-era platformers (specifically the 3:2 aspect ratio and pixel-perfect movement) without relying on any external physics libraries.
+                                </p>
+                            </div>
                         </div>
 
-                        <div id="game-stage-container">
-                            
-                            <canvas id="gameCanvas" width="800" height="450"></canvas>
+                        <div class="case-study-feature">
+                            <div class="case-study-image">
+                                <img src="./images/Solry_sprite_state_machine_diagram.svg" alt="Sprite state machine diagram">
+                            </div>
+                            <div class="case-study-text">
+                                <h4>The Solution: Custom State Management</h4>
+                                <p>
+                                    I engineered a Finite State Machine (FSM) to handle Solry's complex animation logic—transitions between Idle, Run, Jump, Fall, and Attack had to be frame-perfect.
+                                </p>
+                                <ul>
+                                    <li><strong>AABB Collision:</strong> Wrote custom axis-aligned bounding box logic for precise platforming.</li>
+                                    <li><strong>"Consume" Mechanic:</strong> Implemented a dynamic system where the player can eat enemies to regain health, adding a risk/reward layer to combat.</li>
+                                    <li><strong>Optimization:</strong> Used an asset manager to preload sprites, ensuring 60fps performance even on mobile devices.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    <div class="case-study-feature">
+                        <div class="game-demo-section" style="padding: 0 2em 3em 2em; text-align: center;">
+                            <h4 style="margin-bottom: 0.5em; font-size: 1.5rem;">The Result: Playable Prototype</h4>
+                            <p style="max-width: 600px; margin: 0 auto 2em auto; color: #666;">
+                                Below is the live engine running at 60fps. It features responsive scaling<!--, mobile touch controls,--> and full <strong>Gamepad API support</strong> for Xbox/PlayStation controllers.
+                            </p>
 
-                            <div id="game-overlay">
-                                <div class="overlay-content">
-                                    <h4>Pink Quadruped Demo</h4>
-                                    <button id="start-engine-btn">Initialize Engine</button>
+                            <div id="game-stage-container">
+                                <canvas id="gameCanvas" width="240" height="160"></canvas>
+
+                                <div id="game-overlay">
+                                    <div class="overlay-content">
+                                        <h4 style="font-size: 2rem; color: #3e2723;">Solry: Up & Up</h4>
+                                        <p style="margin-bottom: 1.5em; color: #555;">Ready to play test?</p>
+                                        <button id="start-engine-btn">Initialize!</button>
+                                    </div>
+                                </div>
+
+                                <button id="btn-fullscreen-enter">⛶ Full Screen</button>
+                            </div>
+
+                            <div class="controls-container">
+                                <h5>Control Scheme</h5>
+                                <div class="controls-grid">
+                                    <div class="control-row header">
+                                        <span>Action</span>
+                                        <span>Keyboard</span>
+                                        <span>Controller</span>
+                                    </div>
+                                    <div class="control-row">
+                                        <span>Move</span>
+                                        <span class="key-badge">Arrows</span>
+                                        <span>D-Pad / Left Stick</span>
+                                    </div>
+                                    <div class="control-row">
+                                        <span>Jump</span>
+                                        <span class="key-badge">Z</span>
+                                        <span>Button A / Cross</span>
+                                    </div>
+                                    <div class="control-row">
+                                        <span>Attack</span>
+                                        <span class="key-badge">X</span>
+                                        <span>Button X / Square</span>
+                                    </div>
+                                    <div class="control-row">
+                                        <span>Block</span>
+                                        <span class="key-badge">C</span>
+                                        <span>Button B / Circle</span>
+                                    </div>
+                                    <div class="control-row">
+                                        <span>Consume</span>
+                                        <span class="key-badge">V</span>
+                                        <span>Button Y / Triangle</span>
+                                    </div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+            <div class="case-study-item">
+    
+                <button class="case-study-trigger" id="haca-trigger" aria-expanded="false" aria-controls="haca-content-panel">
+    
+                    <div class="case-study-trigger-content">
+                        <img src="./images/haca_logo_black_high_quality.png" alt="Digital Literacy Icon" class="case-study-logo">
+        
+                        <div class="case-study-trigger-text">
+                            <h3 class="case-study-title">Bridging the Digital Divide</h3>
+                            <p class="case-study-subtitle">Curriculum Design & Community Education</p>
+                        </div>
+                    </div>
+    
+                    <span class="case-study-caret"></span>
+                </button>
+    
+                <div class="case-study-content" id="haca-content-panel" role="region">
+                <div class="case-study-content-inner">
+                    
+                    <div class="case-study-feature">
+                        <div class="case-study-image">
+                            <img src="./images/kano_kit_assembly.png" alt="Close up of computer hardware assembly">
+                        </div>
+                        <div class="case-study-text">
+                            <h4>The Challenge: A 48-Hour Pivot</h4>
+                            <p>
+                                We spent weeks designing a custom Linux curriculum, but just 48 hours before launch, we hit a critical wall: the kit's power supplies couldn't handle the voltage load of a full distro, causing screens to black out intermittently.
+                            </p>
+                            <p style="margin-top: 1em;">
+                                Facing a potential cancellation, I rallied my core team for an emergency "sprint." We scrapped the original OS plan, hunted down a stable beta of Kano OS, and spent the next 24 hours re-flashing every SD card. We didn't just fix the bugs; we completely restructured the syllabus overnight to focus on creative gaming (Scratch) rather than terminal commands, ensuring the class would still be a hit.
+                            </p>
+                        </div>
+                    </div>
 
-                            <div id="mobile-controls" class="hidden">
-                                <button id="btn-left" class="touch-btn d-pad">◄</button>
-                                <button id="btn-right" class="touch-btn d-pad">►</button>
-                                <button id="btn-jump" class="touch-btn action-btn">A</button>
-                                <button id="btn-fullscreen-exit" class="touch-btn system-btn">Exit</button>
+                    <div class="case-study-feature">
+                        <div class="case-study-image">
+                            <img src="./images/kano_classroom_setup.jpg" alt="Kano computer kits set up on a table">
+                        </div>
+                        <div class="case-study-text">
+                            <h4>The Solution: Dynamic & Inclusive</h4>
+                            <p>
+                                I managed a dynamic team of 3-8 instructors, using a "tag-team" teaching style where different members led specific modules to keep the energy high. To ensure no student was left behind, we gamified our Q&A sessions, rewarding entire tables for correct answers so shy students could win without the pressure of the spotlight.
+                            </p>
+                            <p style="margin-top: 1em;">
+                                We also took a user-centered approach to classroom management. Instead of imposing rules, we <strong>co-created community guidelines</strong> with the students. We even integrated physical "movement breaks" with guided stretches to combat computer fatigue, acknowledging the physical toll of coding work.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="case-study-feature">
+                        <div class="case-study-image">
+                            <img src="./images/haca_success.jpg" alt="A quote from a student about how much they loved the class">
+                        </div>
+                        <div class="case-study-text">
+                            <h4>The Result</h4>
+                            <p>
+                                The pilot was a resounding success. Students who started as passive consumers of technology left as creators, proudly taking home the computers they built themselves.
+                            </p>
+                            <p style="margin-top: 1em;">
+                                Beyond the classroom, this program served a critical strategic purpose. The documented success of our youth outreach satisfied a key requirement for HACA, <strong>directly assisting them in securing essential funding</strong> to sustain their digital equity mission.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+            <div class="case-study-item">
+    
+                <button class="case-study-trigger" id="peoples-rx-trigger" aria-expanded="false" aria-controls="peoples-rx-content">
+                    
+                    <div class="case-study-trigger-content">
+                        <img 
+                            src="./images/peoplesrx_logo.png" 
+                            alt="Peoples Rx Logo" 
+                            class="case-study-logo" 
+                            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                        >
+                        
+                        <div class="case-study-trigger-text" style="display: none;">
+                            <h3 class="case-study-title">Peoples RX</h3>
+                            <p class="case-study-subtitle">Austin's Wellness Headquarters</p>
+                        </div>
+                    </div>
+
+                    <span class="case-study-caret"></span>
+                </button>
+    
+                <div class="case-study-content" id="peoples-rx-content" role="region">
+                    <div class="case-study-content-inner">
+                        
+                        <div class="case-study-feature">
+                            <div class="case-study-image">
+                                <img src="./images/peoples_rx_sign.jpg" alt="Menu design and food photography">
                             </div>
+                            <div class="case-study-text">
+                                <h4>The Initiative: Operational Design</h4>
+                                <p>
+                                    During my 5-year tenure at Peoples Rx, I leveraged my role as Deli Manager to overhaul the company's struggling marketing efforts. The brand's visual presence was inconsistent, relying on low-quality snapshots and outdated layouts.
+                                </p>
+                                <p style="margin-top: 1em;">
+                                    Recognizing the gap between our premium products and our "amateur" presentation, I stepped in to lead a visual transformation. I utilized my deep product knowledge to restage and photograph our inventory, redesigned the printed menus for three unique locations, and established a professional standard for social media content—all while managing daily deli operations.
+                                </p>
+                            </div>
+                        </div>
 
-                            <button id="btn-fullscreen-enter">⛶ Full Screen</button>
+                        <div class="case-study-feature">
+                            <div class="case-study-image">
+                                <img src="./images/peoples_rx_chili.png" alt="Product line label designs">
+                            </div>
+                            <div class="case-study-text">
+                                <h4>The Technical Challenge: 40 SKUs</h4>
+                                <p>
+                                    After the company adopted a new high-level identity from an external firm, they faced a bottleneck: they had a "design philosophy" but lacked the technical capacity to apply it to their 40+ unique products.
+                                </p>
+                                <p style="margin-top: 1em;">
+                                    I was brought back as a specialist contractor to bridge this gap. Using <strong>Adobe Illustrator and InDesign</strong>, I translated abstract brand guidelines into print-ready reality. This required balancing strict FDA labeling requirements and physical container constraints against the ownership's ambitious aesthetic vision.
+                                </p>
+                            </div>
+                        </div>
 
+                        <div class="case-study-feature">
+                            <div class="case-study-image">
+                                <img src="./images/peoples_rx_brownie_power_bites_zucchini_muffin_chia_pudding_granola.png" alt="Finished products on shelf">
+                            </div>
+                            <div class="case-study-text">
+                                <h4>The Result</h4>
+                                <p>
+                                    I successfully rolled out the new packaging across the entire product line, modernizing the shelf presence of Austin’s favorite pharmacy. 
+                                </p>
+                                <p style="margin-top: 1em;">
+                                    Beyond the deliverables, I focused on sustainability for the team. Before transitioning out, I trained the incoming marketing coordinator on the Adobe Creative Suite, ensuring the company maintained the technical capability to manage their new brand identity moving forward.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="case-study-item">
+    
+                <button class="case-study-trigger" id="crop-crusaders-trigger" aria-expanded="false" aria-controls="crop-crusaders-content">
+    
+                    <div class="case-study-trigger-content">
+                        <img src="./images/crop_crusaders_logo.png" alt="Crop Crusaders Logo" class="case-study-logo">
+        
+                        <div class="case-study-trigger-text">
+                            <h3 class="case-study-title">Crop Crusaders</h3>
+                            <p class="case-study-subtitle">End-to-End Product Design</p>
+                        </div>
+                    </div>
+    
+                    <span class="case-study-caret"></span>
+                </button>
+    
+                <div class="case-study-content" id="crop-crusaders-content" role="region">
+                    <div class="case-study-content-inner">
+                        
+                        <div class="case-study-feature">
+                            <div class="case-study-image">
+                                <img src="./images/crop_crusaders_board_game.png" alt="Physical game board prototype">
+                            </div>
+                            <div class="case-study-text">
+                                <h4>The Challenge: Depth vs. Accessibility</h4>
+                                <p>
+                                    My goal was to create a physical tabletop experience that bridged a difficult gap: it needed to be accessible enough for a 6-year-old, yet possess enough tactical depth to engage hobbyist gamers—all within a snappy 30–60 minute session.
+                                </p>
+                                <p style="margin-top: 1em;">
+                                    I needed to merge two conflicting genres—peaceful resource management (farming) and aggressive territorial control (combat)—into a cohesive loop where every harvest fueled the next battle.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="case-study-feature">
+                            <div class="case-study-image">
+                                <img src="./images/crop_crusaders_being_played.png" alt="Game units and resource tokens">
+                            </div>
+                            <div class="case-study-text">
+                                <h4>The Solution: Bi-Modal Strategy</h4>
+                                <p>
+                                    I engineered a three-phase turn structure (Farm, Build, Combat) that rewards forward planning. To solve the depth issue, I implemented a <strong>bi-modal win condition</strong>: players can win by being a "Builder" (constructing all structures) or a "Survivor" (destroying the opponent).
+                                </p>
+                                <p style="margin-top: 1em;">
+                                    This creates a dynamic "cat and mouse" gameplay loop where players can pivot their entire strategy mid-game based on the board state, keeping replayability high.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="case-study-feature">
+                            <div class="case-study-image">
+                                <img src="./images/crop_crusaders_website.png" alt="Crop Crusaders custom website">
+                            </div>
+                            <div class="case-study-text">
+                                <h4>The Digital Ecosystem</h4>
+                                <p>
+                                    Treating this as a full product launch, I built a custom <strong>WordPress</strong> hub to serve as the game's digital storefront. 
+                                </p>
+                                <p style="margin-top: 1em;">
+                                    Performance was a priority. I engineered the site for speed, utilizing aggressive caching layers and advanced image optimization to ensure near-instant load times. I also leveraged <strong>Adobe Firefly</strong> to generate a consistent, fantasy-themed visual identity that unifies the physical board and the digital web presence.
+                                </p>
+                            </div>
                         </div>
 
                     </div>
                 </div>
             </div>
         </section> 
+        <section class="toolkit_section">
+            <div class="toolkit_header">
+                <h2>Technical Proficiency</h2>
+                <p>The tools I use to build accessible, engaging experiences.</p>
+            </div>
+
+            <div class="toolkit_grid">
+                
+                <div class="toolkit_card">
+                    <div class="card_icon">
+                        &lt;/&gt;
+                    </div>
+                    <h3>Development</h3>
+                    <ul>
+                        <li>JavaScript (ES6+)</li>
+                        <li>HTML5 & CSS3</li>
+                        <li>React & Tailwind</li>
+                        <li>Java (OOP)</li>
+                        <li>Game Logic & Physics</li>
+                    </ul>
+                </div>
+
+                <div class="toolkit_card">
+                    <div class="card_icon">
+                        &#9998; </div>
+                    <h3>Design</h3>
+                    <ul>
+                        <li>UI/UX Prototyping</li>
+                        <li>Figma & Adobe XD</li>
+                        <li>Photoshop & Illustrator</li>
+                        <li>Brand Identity</li>
+                        <li>Accessibility (WCAG)</li>
+                    </ul>
+                </div>
+
+                <div class="toolkit_card">
+                    <div class="card_icon">
+                        &#9881; </div>
+                    <h3>Workflow</h3>
+                    <ul>
+                        <li>Git & GitHub</li>
+                        <li>Agile / Scrum</li>
+                        <li>Responsive Design</li>
+                        <li>Cross-Browser Testing</li>
+                        <li>VS Code</li>
+                    </ul>
+                </div>
+
+            </div>
+        </section>
+
+        <section class="cta_section">
+            <h2>Ready to build something memorable?</h2>
+            <p>I am currently open to new opportunities and collaborations.</p>
+            <a href="mailto:David@McGovern.Design" class="btn_primary">Say Hello</a>
+        </section>
     </main>
 <footer>
         <div class="footer_content">

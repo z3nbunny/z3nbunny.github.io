@@ -2,20 +2,16 @@ document.addEventListener('DOMContentLoaded', () => {
     
     console.log("Main.js loaded successfully.");
 
-    // --- 1. ACCORDION LOGIC ---
+// --- 1. ACCORDION LOGIC ---
     const triggers = document.querySelectorAll('.case-study-trigger');
+
     triggers.forEach(trigger => {
         trigger.addEventListener('click', () => {
+            // Get the current state (Open or Closed?)
             const isExpanded = trigger.getAttribute('aria-expanded') === 'true';
             
-            // Close all others
-            triggers.forEach(otherTrigger => {
-                if (otherTrigger !== trigger) {
-                    otherTrigger.setAttribute('aria-expanded', 'false');
-                }
-            });
-
-            // Toggle current
+            // Toggle ONLY the button that was clicked.
+            // We removed the code that searched for other buttons to close them.
             trigger.setAttribute('aria-expanded', !isExpanded);
         });
     });
