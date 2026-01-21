@@ -486,7 +486,7 @@ img.logo:hover { filter: drop-shadow(0 0 5px rgba(0,0,0,0.4)); }
 
 #haca-trigger:hover {
     /* Lighten the overlay slightly on hover for a "glow" effect */
-    background-image: url('../images/Kano_course_background.png');
+    background-image: url('../images/kano_course_background.png');
 }
 
 /* White Caret for dark background */
