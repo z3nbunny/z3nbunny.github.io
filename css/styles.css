@@ -485,7 +485,6 @@ img.logo:hover { filter: drop-shadow(0 0 5px rgba(0,0,0,0.4)); }
 }
 
 #haca-trigger:hover {
-    /* Lighten the overlay slightly on hover for a "glow" effect */
     background-image: url('../images/kano_course_background.png');
 }
 
@@ -495,13 +494,13 @@ img.logo:hover { filter: drop-shadow(0 0 5px rgba(0,0,0,0.4)); }
 /* --- Project 4: Peoples Rx (Local Wellness) --- */
 #peoples-rx-trigger {
     background: #ffffff;
-    border: 1px solid #e0e0e0; /* Light border defines it against page white */
-    color: #0d47a1; /* Deep Navy Blue text color (for the backup text) */
+    border: 1px solid #e0e0e0;
+    color: #0d47a1;
 }
 
 /* Hover State */
 #peoples-rx-trigger:hover {
-    background: #f8f9fa; /* Very subtle grey on hover */
+    background: #f8f9fa;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
